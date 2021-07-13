@@ -80,7 +80,6 @@ export default {
       //     console.log(res)
       //   },
       // })
-      console.log('1')
       uni.login({
         provider: 'weixin',
         success: function (res) {
