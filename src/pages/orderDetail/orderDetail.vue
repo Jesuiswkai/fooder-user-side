@@ -1,0 +1,530 @@
+<template>
+  <app-page title="订单详情" :bgColor="bgColor" showNavbar>
+    <view class="container">
+      <view
+        class="top"
+        :class="
+          orderInfo.orderType == 1
+            ? 'waiting'
+            : orderInfo.orderType == 2 || orderInfo.orderType == 3
+            ? 'transit'
+            : orderInfo.orderType == 4
+            ? 'complete'
+            : orderInfo.orderType == 5
+            ? 'cancel'
+            : ''
+        "
+      >
+        <view
+          class="title"
+          :style="{ 'margin-top': orderInfo.orderType == 4 ? '85rpx' : '' }"
+          >{{
+            orderInfo.orderType == 1
+              ? '待付款'
+              : orderInfo.orderType == 2
+              ? '待配送'
+              : orderInfo.orderType == 3
+              ? '配送中'
+              : orderInfo.orderType == 4
+              ? '已完成'
+              : orderInfo.orderType == 5
+              ? '已取消'
+              : ''
+          }}</view
+        >
+        <view class="text">{{
+          orderInfo.orderType == 1
+            ? '未支付，请及时处理'
+            : orderInfo.orderType == 2
+            ? '商品准备中'
+            : orderInfo.orderType == 3
+            ? '商品配送中'
+            : orderInfo.orderType == 4
+            ? ''
+            : orderInfo.orderType == 5
+            ? '未支付，交易关闭'
+            : ''
+        }}</view>
+      </view>
+
+      <!--配送方式-->
+      <view class="transport-type">
+        <view class="key">配送方式</view>
+        <view class="value">{{
+          orderInfo.type == 1 ? '线上配送' : '门店自提'
+        }}</view>
+      </view>
+
+      <!--接收人-->
+      <view class="receiveRen">
+        <!--线上-->
+        <view class="online" v-if="orderInfo.type == 1">
+          <view class="info">
+            <view>陈锐</view>
+            <view>18002334272</view>
+          </view>
+          <view class="address">重庆市江北区西普大厦10-1</view>
+        </view>
+        <!--线下-->
+        <view class="underline" v-else>
+          <view>陈锐</view>
+          <view>18002334272</view>
+        </view>
+      </view>
+
+      <!--提货点-->
+      <view class="pickup-address" v-if="orderInfo.type == 2">
+        <view>提货点：西普6号店</view>
+        <view>重庆市九龙坡区隆鑫盛世普天</view>
+      </view>
+
+      <!--时间-->
+      <view class="time">
+        <!--期望配送时间-->
+        <view class="transport-time" v-if="orderInfo.type == 1">
+          <view>期望配送时间</view>
+          <view>2021.06.24</view>
+        </view>
+        <!--预计自提时间-->
+        <view class="self-time" v-else>
+          <view>预计自提时间</view>
+          <view>2021.06.24</view>
+        </view>
+      </view>
+
+      <!--商品列表-->
+      <view class="product-list">
+        <view
+          class="card"
+          v-for="(item, index) of orderInfo.productList"
+          :key="index"
+        >
+          <image src="@/static/index/shop1.png" mode="" />
+          <view class="info">
+            <view class="name">{{ item.name }}</view>
+            <view class="other">
+              <text>¥{{ item.price }}</text>
+              <text>X{{ item.spec }}包</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!--订单详情项-->
+      <view class="order-item">
+        <view
+          class="line-info"
+          v-for="(item, index) of orderInfo.orderList"
+          :key="index"
+        >
+          <view class="key">{{ item.key }}</view>
+          <view class="value" :class="item.orange == 1 ? 'orange' : ''">{{
+            item.value
+          }}</view>
+        </view>
+      </view>
+
+      <!--备注-->
+      <view class="remark">
+        <view class="title">备注</view>
+        <view class="content"></view>
+      </view>
+
+      <!--额外信息-->
+      <view class="extra-info">
+        <!--配送中-线上-->
+        <view
+          class="transport-online"
+          v-if="orderInfo.type == 1 && orderInfo.orderType == 3"
+        >
+          <view class="title">配送员</view>
+          <view class="personnel">
+            <view class="name">陈锐</view>
+            <view class="phone">18002334272</view>
+          </view>
+        </view>
+        <!--已完成-线上-->
+        <view
+          class="completed-online"
+          v-if="orderInfo.type == 1 && orderInfo.orderType == 4"
+        >
+          <view class="title">配送员</view>
+          <view class="personnel">
+            <view class="name">陈锐</view>
+            <view class="phone">18002334272</view>
+          </view>
+          <view class="title">送达时间</view>
+          <view>2021.6.30 14:11:36</view>
+        </view>
+        <!--已完成-线下-->
+        <view
+          class="completed-underline"
+          v-if="orderInfo.type == 2 && orderInfo.orderType == 4"
+        >
+          <view class="title">送达时间</view>
+          <view>2021.6.30 14:11:36</view>
+        </view>
+        <!--已取消-后台-->
+        <view class="canceled-underline" v-if="orderInfo.orderType == 5">
+          <view class="personnel">
+            <view class="name">取消类型</view>
+            <view class="phone">平台取消</view>
+          </view>
+          <view class="personnel" style="margin-top: 20rpx">
+            <view class="name">取消时间</view>
+            <view class="phone">2021.6.30 11:43:25</view>
+          </view>
+          <view class="personnel" style="margin-top: 20rpx">
+            <view class="name">退款金额</view>
+            <view class="phone">¥150.00</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="opera">
+      <view class="opera-btn">
+        <view class="waiting" v-if="orderInfo.orderType == 1">
+          <button class="cancelOrder">取消订单</button>
+          <button class="toPay">去付款</button>
+        </view>
+        <view
+          class="transport"
+          v-else-if="orderInfo.orderType == 2 || orderInfo.orderType == 3"
+        >
+          <button class="completeReceipt">确认收货</button>
+        </view>
+        <view
+          class="complete"
+          v-else-if="orderInfo.orderType == 4 || orderInfo.orderType == 5"
+        >
+          <button class="buyAgain">再次购买</button>
+        </view>
+      </view>
+    </view>
+  </app-page>
+</template>
+
+<script>
+import waiting from '@/static/order/waiting.png'
+export default {
+  data() {
+    return {
+      bgColor: '#f5f5f5',
+      orderInfo: {
+        type: 1, //1:线上 2:线下
+        orderType: 1, //1: 待付款 2: 待配送 3: 配送中 4: 已完成 5: 已取消
+        productList: [
+          { url: '', name: '双胞胎种猪配合饲料40kg', price: '140', spec: '1' },
+          { url: '', name: '双胞胎种猪配合饲料40kg', price: '140', spec: '3' },
+          { url: '', name: '双胞胎种猪配合饲料40kg', price: '140', spec: '2' },
+        ],
+        orderList: [
+          { key: '订单编号', value: '123456789', orange: 0 },
+          { key: '订单时间', value: '2021.6.30 11:43:25', orange: 0 },
+          { key: '商品总额', value: '¥300.00', orange: 0 },
+          { key: '优惠券', value: '- ¥ 10.00', orange: 1 },
+          { key: '实付金额', value: '¥290.00', orange: 0 },
+        ],
+      },
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.container {
+  width: 690rpx;
+  margin: 0 auto;
+  margin-top: 10rpx;
+  padding-bottom: 220rpx;
+  .top::before {
+    display: table;
+    content: '';
+  }
+  .top {
+    width: 690rpx;
+    height: 220rpx;
+    border-radius: 20rpx;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    .title {
+      font-size: 36rpx;
+      font-weight: bold;
+      margin-top: 50rpx;
+      text-align: center;
+    }
+    .text {
+      font-size: 24rpx;
+      font-weight: 400;
+      color: #666666;
+      margin-top: 30rpx;
+      text-align: center;
+    }
+  }
+  .top.waiting {
+    background-image: url('@/static/order/waiting.png');
+    .title {
+      color: #ff2424;
+    }
+  }
+  .top.transit {
+    background-image: url('@/static/order/transit.png');
+    .title {
+      color: #24afff;
+    }
+  }
+  .top.complete {
+    background-image: url('@/static/order/complete.png');
+    .title {
+      color: #2eb232;
+    }
+  }
+  .top.cancel {
+    background-image: url('@/static/order/cancel.png');
+    .title {
+      color: #666666;
+    }
+  }
+  .transport-type {
+    padding: 24rpx 20rpx;
+    margin-top: 30rpx;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 20rpx;
+    view {
+      font-size: 30rpx;
+      font-weight: bold;
+    }
+    .key {
+      color: #333333;
+    }
+    .value {
+      color: #2eb232;
+    }
+  }
+  .receiveRen {
+    padding: 24rpx 20rpx;
+    margin-top: 30rpx;
+    background: #fff;
+    border-radius: 20rpx;
+    .online {
+      font-size: 30rpx;
+      font-weight: bold;
+      color: #333333;
+      .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .address {
+        margin-top: 20rpx;
+        color: #666;
+      }
+    }
+    .underline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      view {
+        font-size: 30rpx;
+        font-weight: bold;
+        color: #333333;
+      }
+    }
+  }
+  .pickup-address {
+    padding: 20rpx;
+    margin-top: 30rpx;
+    background: #fff;
+    border-radius: 20rpx;
+    font-size: 30rpx;
+    font-weight: bold;
+    :first-child {
+      color: #333;
+    }
+    :last-child {
+      color: #666;
+      margin-top: 20rpx;
+    }
+  }
+  .time {
+    padding: 24rpx 20rpx;
+    margin-top: 30rpx;
+    background: #fff;
+    border-radius: 20rpx;
+    .transport-time,
+    .self-time {
+      font-size: 30rpx;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      :first-child {
+        color: #333;
+      }
+      :last-child {
+        color: #666;
+      }
+    }
+  }
+  .product-list {
+    .card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 20rpx;
+      margin-top: 30rpx;
+      border-radius: 20rpx;
+      image {
+        width: 160rpx;
+        height: 160rpx;
+      }
+      .info {
+        width: 490rpx;
+        height: 160rpx;
+        margin-left: 20rpx;
+        font-size: 24rpx;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .name {
+          color: #333333;
+        }
+        .other {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          text:first-child {
+            color: #ff2424;
+          }
+          text:last-child {
+            color: #666666;
+          }
+        }
+      }
+    }
+  }
+  .order-item {
+    margin-top: 30rpx;
+    background: #fff;
+    padding: 20rpx;
+    border-radius: 20rpx;
+    .line-info:not(:first-child) {
+      margin-top: 20rpx;
+    }
+    .line-info {
+      font-size: 24rpx;
+      font-weight: bold;
+      color: #333333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .value.orange {
+        color: #ff7539;
+      }
+    }
+  }
+  .remark {
+    background: #ffffff;
+    border-radius: 20rpx;
+    margin-top: 20rpx;
+    padding: 10rpx 20rpx;
+    display: flex;
+    align-items: center;
+    .title {
+      height: 100%;
+      padding-right: 20rpx;
+      border-right: 2rpx solid #e5e5e5;
+      font-size: 24rpx;
+      font-weight: bold;
+      color: #333333;
+    }
+    .content {
+      width: 560rpx;
+      padding: 14rpx 0rpx;
+      margin-left: 20rpx;
+      font-size: 24rpx;
+      font-weight: 400;
+      color: #666666;
+    }
+  }
+  .extra-info {
+    background: #ffffff;
+    margin-top: 20rpx;
+    border-radius: 20rpx;
+    font-size: 24rpx;
+    font-weight: bold;
+    color: #333333;
+    .title {
+      color: #666666;
+      margin-bottom: 20rpx;
+    }
+    .title + view:not(:last-child) {
+      margin-bottom: 20rpx;
+    }
+    .personnel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .transport-online,
+    .completed-online,
+    .completed-underline,
+    .canceled-underline {
+      padding: 20rpx;
+    }
+  }
+}
+
+.opera {
+  position: fixed;
+  bottom: 0rpx;
+  width: 100%;
+  height: 178rpx;
+  background: #fff;
+  box-shadow: 0px -3px 6px rgba(0, 0, 0, 0.15);
+  .opera-btn {
+    width: 100%;
+    height: 110rpx;
+    padding: 20rpx 30rpx 0rpx 30rpx;
+    button {
+      height: 70rpx;
+      line-height: 70rpx;
+      background: #2eb232;
+      border-radius: 45rpx;
+      font-size: 24rpx;
+      font-weight: bold;
+      color: #ffffff;
+      margin: 0rpx;
+    }
+    .waiting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .cancelOrder {
+        width: 220rpx;
+        background: #e5e5e5;
+        color: #666666;
+      }
+      .toPay {
+        width: 220rpx;
+      }
+    }
+    .transport,
+    .complete {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .completeReceipt,
+      .buyAgain {
+        width: 440rpx;
+      }
+    }
+  }
+}
+</style>

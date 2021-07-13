@@ -1,0 +1,149 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/shoppingCart/shoppingCart",
+      "style": {
+        "navigationBarTitleText": "购物车"
+      }
+    },
+    {
+      "path": "pages/updateModal/updateModal",
+      "style": {
+        "navigationBarTitleText": "升级弹窗"
+      }
+    },
+    {
+      "path": "pages/aboutUs/aboutUs",
+      "style": {
+        "navigationBarTitleText": "关于我们"
+      }
+    },
+    {
+      "path": "pages/helpCenter/helpCenter",
+      "style": {
+        "navigationBarTitleText": "帮助中心"
+      }
+    },
+    {
+      "path": "pages/messageNotification/messageNotification",
+      "style": {
+        "navigationBarTitleText": "消息通知"
+      }
+    },
+    {
+      "path": "pages/paymentSuccessful/paymentSuccessful",
+      "style": {
+        "navigationBarTitleText": "支付成功"
+      }
+    },
+    {
+      "path": "pages/orderCoupon/orderCoupon",
+      "style": {
+        "navigationBarTitleText": "选择优惠券"
+      }
+    },
+    {
+      "path": "pages/pickUpInfo/pickUpInfo",
+      "style": {
+        "navigationBarTitleText": "提货信息"
+      }
+    },
+    {
+      "path": "pages/pickUpInfoUpdate/pickUpInfoUpdate",
+      "style": {
+        "navigationBarTitleText": "编辑提货信息"
+      }
+    },
+    {
+      "path": "pages/orderDetail/orderDetail",
+      "style": {
+        "navigationBarTitleText": "订单详情"
+      }
+    },
+    {
+      "path": "pages/order/order",
+      "style": {
+        "navigationBarTitleText": "确认下单"
+      }
+    },
+    {
+      "path": "pages/myOrder/myOrder",
+      "style": {
+        "navigationBarTitleText": "我的订单"
+      }
+    },
+    {
+      "path": "pages/productDetail/productDetail",
+      "style": {
+        "navigationBarTitleText": "商品详情"
+      }
+    },
+    {
+      "path": "pages/classification/classification",
+      "style": {
+        "navigationBarTitleText": "分类"
+      }
+    },
+    {
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
+      "path": "pages/serviceProvider/serviceProvider",
+      "style": {
+        "navigationBarTitleText": "选择服务商"
+      }
+    }
+  ],
+  "tabBar": {
+    "color": "#B5CBAF",
+    "selectedColor": "#FFFFFF",
+    "backgroundColor":"#3E7841",
+    "height":"55px",
+    "spacing": "8px",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "/static/tabBar/home.png",
+        "selectedIconPath": "/static/tabBar/home_action.png"
+      },
+      {
+        "pagePath": "pages/classification/classification",
+        "text": "分类",
+        "iconPath": "/static/tabBar/classify.png",
+        "selectedIconPath": "/static/tabBar/classify_action.png"
+      },
+      {
+        "pagePath": "pages/shoppingCart/shoppingCart",
+        "text": "购物车",
+        "iconPath": "/static/tabBar/shoping_car.png",
+        "selectedIconPath": "/static/tabBar/shoping_car_action.png"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F8F8F8",
+    "navigationStyle": "custom"
+  },
+  "easycom": {
+    "^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+  }
+}
