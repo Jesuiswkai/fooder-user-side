@@ -33,6 +33,9 @@
           <view class="other">
             <view>其他登录方式</view>
             <image src="@/static/login/wechart.png" mode="" @click="wxlogin" />
+            <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
+              微信登录
+            </button>
           </view>
         </view>
       </view>
@@ -50,7 +53,12 @@ export default {
       // refCode: null,
       seconds: 10,
       checked: false,
+      code: null,
+      encryptedData: null,
     }
+  },
+  onLoad() {
+    this.getWxLoginParams()
   },
   methods: {
     codeChange(text) {
@@ -73,19 +81,35 @@ export default {
         this.$u.toast('倒计时结束后再发送')
       }
     },
-    wxlogin() {
-      // uni.getProvider({
-      //   service: 'oauth',
-      //   success: function (res) {
-      //     console.log(res)
-      //   },
-      // })
+    getPhoneNumber(res) {
+      this.encryptedData = res.detail.encryptedData
+      this.iv = res.detail.iv
+      this.wxlogin()
+    },
+    getWxLoginParams() {
       uni.login({
         provider: 'weixin',
-        success: function (res) {
-          console.log(res)
+        success: (res) => {
+          this.code = res.code
         },
       })
+    },
+    wxlogin() {
+      this.Api.user.login
+        .do({
+          code: this.code,
+          encryptedData: this.encryptedData,
+          iv: this.iv,
+        })
+        .then((res) => {
+          this.$store.commit('auth/login', res)
+          uni.switchTab({
+            url: '../index/index',
+          })
+          // uni.navigateTo({
+          //   url: '../testPay/testPay',
+          // })
+        })
     },
   },
 }

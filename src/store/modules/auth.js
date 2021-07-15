@@ -2,32 +2,31 @@ export default {
   namespaced: true,
   state: {
     isLogin: false,
-    user: null,
+    userId: null,
     token: null
   },
   getters: {
     isLogin: (state, getters, rootState, rootGetters) => {
-      return state.isLogin;
-    },
-    user: (state, getters, rootState, rootGetters) => {
-      return state.user || {};
+      return state.isLogin
     },
     token: (state, getters, rootState, rootGetters) => {
-      return state.token || '';
+      return state.token || ''
     }
   },
   mutations: {
-    login: (state, payload) => {
-      state.user = payload.user;
-      state.isLogin = true;
+    login: (state, step) => {
+      state.userId = step.userId
+      state.token = step.token
+      state.isLogin = true
     },
-    logout: (state, payload) => {
-      state.user = null;
-      state.isLogin = false;
+    logout: (state, step) => {
+      state.userId = null
+      state.token = null
+      state.isLogin = false
     }
   },
   actions: {
     // name: ({ state }) => {
     // }
   }
-};
+}

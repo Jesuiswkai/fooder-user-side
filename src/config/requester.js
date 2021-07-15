@@ -9,18 +9,18 @@ export async function request({
 }) {
   let rst = null
   let header = {
-    Authorization:
-      'C7Q6tS764IF0yWzl6xltoR8EY5M1jWP2dmZfM+ZbEuy9NlM5KdAUeTOCImR8iiMr',
+    Authorization: store.getters['auth/token'],
+    // Authorization:
+    //   'l7adGWhnVU6yZqKYRlDsbNy6weAjBmOtdSE8iwHR6LG7+JBDw0lbpJYm2KhnXblD',
     app: 2
   }
 
   if (!pb) {
     header['3RD_SESSION'] = store.getters['auth/token']
   }
-
   method = method.toUpperCase()
   url = process.env.VUE_APP_apiBaseURL + url
-
+  console.log('请求url', url)
   try {
     let [error, res] = await uni.request({
       method,
@@ -30,15 +30,19 @@ export async function request({
     })
 
     if (error) {
+      console.log('错误', error)
       rst = error
       throw rst
     } else {
       rst = res
+      console.log(rst)
       if (rst.statusCode !== 200) {
         if (rst.statusCode === 401) {
           store.commit('auth/logout')
-          uni.reLaunch({
-            url: 'login'
+          uni.showToast({
+            title: rst.data.msg,
+            icon: 'none',
+            duration: 2000
           })
         }
 
@@ -52,6 +56,7 @@ export async function request({
       }
     }
   } catch (error) {
+    console.log('请求错误', error)
     throw error
   }
 

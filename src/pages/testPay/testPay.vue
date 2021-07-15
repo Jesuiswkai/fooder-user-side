@@ -1,6 +1,7 @@
 <template>
   <app-page title="订单详情" showNavbar>
     <button @click="getProvider">获取服务供应商</button>
+    <button @click="toIndex">跳转首页</button>
     <button @click="pay">支付</button>
 
     <u-select
@@ -17,7 +18,7 @@ import md5 from 'js-md5'
 export default {
   data() {
     return {
-      show: true,
+      show: false,
       list: [
         {
           value: 1,
@@ -85,10 +86,14 @@ export default {
         },
       })
     },
+    toIndex() {
+      console.log('123')
+      uni.switchTab({
+        url: '../index/index',
+      })
+    },
     pay() {
-      // {"code":0,"msg":null,"data":{"package":"Sign=WXPay","appid":"wx2717380465250176","sign":"6FEFE020CCF378C923DDA01EDA247F80","partnerid":"1604930438","prepayid":"wx0815573388478377227659922131870000","noncestr":"8c75791b109b4d14b80af425bbdb8356","timestamp":"1625731062"}}
-      this.show = true
-      return
+      console.log('获取支付信息')
       this.Api.user.getPayInfo
         .do({
           providersId: 'oliver',
@@ -103,44 +108,61 @@ export default {
           selfPickId: '1',
           expectTime: '2021-07-06 18:26:00',
           remark: '备注',
-          payType: 1,
+          payType: 2, //2: 小程序  1: app
           consignee: 'oliver',
           contactNumber: '123456',
           province: '重庆',
           city: '重庆市',
           area: '南岸区',
           detailAddress: '122323',
+          openId: 'o_InI5So4Em7srTInXEqjpnT2kc4',
         })
         .then((res) => {
-          console.log('调支付')
-          uni.requestPayment({
-            provider: 'wxpay',
-            // orderInfo: {
-            //   // appid: res.appid,
-            //   timeStamp: String(Date.now()),
-            //   nonceStr: 'A1B2C3D4E5',
-            //   package: 'prepay_id=' + res.prepayid + '',
-            //   // partnerid: res.partnerid,
-            //   signType: 'MD5',
-            //   paySign: paySign,
-            //   appid: 'wx2717380465250176',
-            //   partnerid: '1604930438',
-            //   prepayid: 'wx08152035458144d01ca0bcee8a1e190000',
-            // },
-            orderInfo: res.data,
-            success: function (res) {
-              console.log('success:' + JSON.stringify(res))
-              alert(JSON.stringify(res))
-            },
-            fail: function (err) {
-              console.log('fail:' + JSON.stringify(err))
-              alert(JSON.stringify(err))
-            },
-            complete: function (data) {
-              console.log('complete:' + JSON.stringify(data))
-              alert(JSON.stringify(data))
-            },
-          })
+          console.log(res)
+          console.log('起调支付')
+          orderInfo: res.data,
+            uni.requestPayment({
+              provider: 'wxpay',
+              timeStamp: res.timeStamp,
+              nonceStr: res.nonceStr,
+              package: res.package,
+              signType: 'MD5',
+              paySign: res.paySign,
+
+              success: function (res) {
+                console.log('success:' + JSON.stringify(res))
+              },
+              fail: function (err) {
+                console.log('fail:' + JSON.stringify(err))
+              },
+              complete: function (data) {
+                console.log('complete:' + JSON.stringify(data))
+              },
+            })
+
+          // const orderInfo = {
+          //   appid: res.appid,
+          //   noncestr: res.noncestr,
+          //   package: res.package,
+          //   partnerid: res.partnerid,
+          //   prepayid: res.prepayid,
+          //   timestamp: res.timestamp,
+          //   sign: res.sign
+          // }
+          // uni.requestPayment({
+          //   provider: 'wxpay',
+          //   orderInfo: JSON.stringify(orderInfo),
+
+          //   success: function(res) {
+          //     console.log('success:' + JSON.stringify(res))
+          //   },
+          //   fail: function(err) {
+          //     console.log('fail:' + JSON.stringify(err))
+          //   },
+          //   complete: function(data) {
+          //     console.log('complete:' + JSON.stringify(data))
+          //   },
+          // })
         })
 
       // const paySign = md5(

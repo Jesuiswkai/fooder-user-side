@@ -33,15 +33,16 @@
             :class="item.action == 1 ? 'first-item-action' : ''"
             v-for="(item, index) of firstList"
             :key="index"
+            @click="selectFirstType(item)"
           >
             <view class="first-img">
               <image
-                :src="item.url"
+                :src="item.image"
                 mode=""
                 :style="{ width: item.width, height: item.height }"
               />
             </view>
-            <view class="text">{{ item.text }}</view>
+            <view class="text">{{ item.name }}</view>
           </view>
         </view>
         <view class="classify-second">
@@ -50,22 +51,43 @@
             :class="item.action == 1 ? 'second-item-action' : ''"
             v-for="(item, index) of secondList"
             :key="index"
-            >{{ item.text }}</view
+            @click="selectSecondType(item)"
+            >{{ item.name }}</view
           >
         </view>
       </view>
 
       <view class="classify-content">
         <view class="classify-result">
-          <view class="shop-list">
-            <shop-item
-              class="shop-item"
-              v-for="(item, index) of shopList"
-              :key="index"
-              :obj="item"
-              @info="getShopInfo"
-            ></shop-item>
-          </view>
+          <!-- <view class="shop-list"> -->
+          <scroll-view
+            scroll-y
+            @scrolltolower="scrollToLower()"
+            :refresher-enabled="isLogin"
+            @refresherrefresh="refreshData()"
+            :refresher-triggered="triggered"
+          >
+            <lazy-list
+              v-model="shopList.loading"
+              :list="shopList.data"
+              :finished="shopList.finished"
+              @load="loadData"
+              proxy
+              ref="lazyList"
+              hideLoadmore
+            >
+              <view class="shop-list">
+                <shop-item
+                  class="shop-item"
+                  v-for="(item, index) of shopList.data"
+                  :key="index"
+                  :obj="item"
+                  @info="getShopInfo"
+                ></shop-item>
+              </view>
+            </lazy-list>
+          </scroll-view>
+          <!-- </view> -->
         </view>
       </view>
     </view>
@@ -88,35 +110,42 @@ export default {
   },
   data() {
     return {
+      // isLogin: this.$store.getters['auth/isLogin'],
+      isLogin: true,
+      triggered: false,
       clearBtnShow: false, //是否显示清空按钮
       searchFocus: false, //是否获取焦点
       searchValue: '',
       historySearchList: ['猪饲料', '鸡饲料', '保健品', '饲养设备 猪食槽'],
-      shopList: [
-        { src: shop1, name: '双胞胎种猪配合饲料40kg', price: '¥100' },
-        { src: shop2, name: '双胞胎种猪配合饲料60kg', price: '¥150' },
-        { src: shop2, name: '双胞胎种猪配合饲料80kg', price: '¥200' },
-      ],
+      // shopList: [
+      //   { src: shop1, name: '双胞胎种猪配合饲料40kg', price: '¥100' },
+      //   { src: shop2, name: '双胞胎种猪配合饲料60kg', price: '¥150' },
+      //   { src: shop2, name: '双胞胎种猪配合饲料80kg', price: '¥200' },
+      // ],
+      shopList: {
+        loading: false,
+        finished: false,
+        page: 0,
+        data: [
+          { src: shop1, name: '双胞胎种猪配合饲料40kg', price: '¥100' },
+          { src: shop2, name: '双胞胎种猪配合饲料60kg', price: '¥150' },
+          { src: shop2, name: '双胞胎种猪配合饲料80kg', price: '¥200' },
+        ],
+      },
       firstList: [
         {
-          url: classify1,
-          text: '猪料',
+          image: classify1,
+          name: '猪料',
           width: '52rpx',
           height: '40rpx',
           action: 1,
         },
-        { url: classify2, text: '鱼料', width: '52rpx', height: '29rpx' },
-        { url: classify3, text: '动保', width: '40rpx', height: '40rpx' },
-        { url: classify4, text: '消耗品', width: '20rpx', height: '40rpx' },
-        { url: classify5, text: '设备', width: '40rpx', height: '40rpx' },
+        { image: classify2, name: '鱼料', width: '52rpx', height: '29rpx' },
+        { image: classify3, name: '动保', width: '40rpx', height: '40rpx' },
+        { image: classify4, name: '消耗品', width: '20rpx', height: '40rpx' },
+        { image: classify5, name: '设备', width: '40rpx', height: '40rpx' },
       ],
-      secondList: [
-        { text: '全部', action: 1 },
-        { text: '教保料' },
-        { text: '育肥料' },
-        { text: '繁殖猪料' },
-        { text: '浓缩预混料' },
-      ],
+      secondList: [{ id: '', name: '全部', action: 1 }],
     }
   },
   watch: {
@@ -128,6 +157,9 @@ export default {
       }
     },
   },
+  onShow() {
+    this.getProductType()
+  },
   methods: {
     clearSearch() {
       this.searchValue = ''
@@ -135,6 +167,83 @@ export default {
     },
     getShopInfo(data) {
       console.log(data)
+    },
+    //获取商品一级分类
+    getProductType() {
+      this.Api.product.getParentGoodTypeList.do().then((res) => {
+        const data = []
+        for (let i = 0; i < res.length; i++) {
+          res[i].action = i == 0 ? 1 : 0
+          data.push(res[i])
+        }
+        this.firstList = data
+        this.getSecondType(res[0].id)
+      })
+    },
+    //获取商品二级分类
+    getSecondType(id) {
+      this.secondList = this.secondList.slice(0, 1)
+      this.Api.product.getGoodTypeListByParentId
+        .do({
+          parentId: id,
+        })
+        .then((res) => {
+          for (let i = 0; i < res.length; i++) {
+            res[i].action = 0
+            this.secondList.push(res[i])
+          }
+          this.getProductListByType()
+        })
+    },
+    //选择一级分类
+    selectFirstType(data) {
+      for (let item of this.firstList) {
+        if (item.action == 1) {
+          item.action = 0
+        }
+      }
+      data.action = 1
+      this.getSecondType(data.id)
+    },
+    // 选择二级分类
+    selectSecondType(data) {
+      for (let item of this.secondList) {
+        if (item.action == 1) {
+          item.action = 0
+        }
+        console.log(item.action)
+      }
+      data.action = 1
+      this.getProductListByType()
+    },
+    //根据商品分类获取商品列表
+    getProductListByType() {
+      // this.Api.product.getGoodsList.do()
+      let firstItem = this.firstList.filter((item) => {
+        return item.action == 1
+      })
+      let secondItem = this.secondList.filter((item) => {
+        return item.action == 1
+      })
+      console.log(firstItem, secondItem)
+    },
+    scrollToLower() {
+      this.$refs['lazyList'].loadMore()
+    },
+    refreshData() {
+      console.log('自定义下拉刷新被触发')
+    },
+    loadData() {
+      console.log('lazy内load被触发')
+      setTimeout(() => {
+        for (let i = 0; i < 3; i++) {
+          this.shopList.data.push({
+            src: shop2,
+            name: '双胞胎种猪配合饲料80kg',
+            price: '¥200',
+          })
+        }
+      }, 1000)
     },
   },
 }
@@ -216,8 +325,12 @@ export default {
       padding: 0rpx 20rpx;
       margin-top: 30rpx;
       display: flex;
-      justify-content: space-between;
+      // justify-content: space-between;
       align-items: center;
+      overflow-x: auto;
+      .first-item:not(:first-child) {
+        margin-left: 50rpx;
+      }
       .first-item {
         .first-img {
           width: 90rpx;
@@ -227,6 +340,10 @@ export default {
           display: flex;
           justify-content: center;
           align-items: center;
+          image {
+            width: 52rpx;
+            height: 52rpx;
+          }
         }
         .text {
           margin-top: 8rpx;

@@ -16,17 +16,19 @@
     <view class="index-center">
       <view class="search-line">
         <view class="service-pro" @click="toService">
-          <view class="img"></view>
+          <view class="img">
+            <image :src="latelyProviders.image" mode="" />
+          </view>
           <view class="distance">
             <view class="name">
-              <view>西普6号店</view>
+              <view>{{ latelyProviders.name }}</view>
               <image
                 src="@/static/index/right.png"
                 mode=""
                 style="width: 10rpx; height: 18rpx"
               />
             </view>
-            <view class="number">距离3.4km</view>
+            <view class="number">距离{{ latelyProviders.distanceString }}</view>
           </view>
         </view>
         <view class="search-input" @click="toSearch">
@@ -44,7 +46,7 @@
           v-for="(item, index) of shopTypeList"
           :key="index"
         >
-          <image :src="item.src" mode="" />
+          <image :src="item.image" mode="" />
           <view class="shop-type-name">
             <view class="type-name">{{ item.name }}</view>
             <image src="@/static/index/typeName.png" mode="" />
@@ -60,16 +62,16 @@
             v-for="(item, index) of shopList"
             :key="index"
           >
-            <image :src="item.src" mode="" />
+            <image :src="item.img" mode="" />
             <view class="shop-name">{{ item.name }}</view>
-            <view class="shop-price">{{ item.price }}</view>
+            <view class="shop-price">{{ item.money }}</view>
           </view>
         </view>
       </view>
     </view>
 
     <view class="about-us">
-      <image src="@/static/index/aboutUs.png" mode="" />
+      <image :src="aboutUsImage" mode="" />
     </view>
   </app-page>
 </template>
@@ -85,35 +87,38 @@ import shop2 from '@/static/index/shop2.png'
 export default {
   data() {
     return {
-      list: [
-        {
-          image: 'https://cdn.uviewui.com/uview/swiper/1.jpg',
-          title: '昨夜星辰昨夜风，画楼西畔桂堂东',
-        },
-        {
-          image: 'https://cdn.uviewui.com/uview/swiper/2.jpg',
-          title: '身无彩凤双飞翼，心有灵犀一点通',
-        },
-        {
-          image: 'https://cdn.uviewui.com/uview/swiper/3.jpg',
-          title: '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳',
-        },
-      ],
+      longitude: null, // 经度
+      latitude: null, //纬度
+      list: [],
       shopTypeList: [
-        { src: shopType1, name: '猪料' },
-        { src: shopType2, name: '鱼料' },
-        { src: shopType3, name: '动保' },
-        { src: shopType4, name: '消耗品' },
-        { src: shopType5, name: '设备' },
+        { image: shopType1, name: '猪料' },
+        { image: shopType2, name: '鱼料' },
+        { image: shopType3, name: '动保' },
+        { image: shopType4, name: '消耗品' },
+        { image: shopType5, name: '设备' },
       ],
       shopList: [
-        { src: shop1, name: '双胞胎种猪配合饲料40kg', price: '¥150' },
-        { src: shop2, name: '双胞胎种猪配合饲料40kg', price: '¥150' },
+        { img: shop1, name: '双胞胎种猪配合饲料40kg', money: '¥150' },
+        { img: shop2, name: '双胞胎种猪配合饲料40kg', money: '¥150' },
       ],
+      latelyProviders: {
+        name: '',
+        image: null,
+        distanceString: '',
+      },
+      aboutUsImage: '../../static/index/aboutUs.png',
     }
   },
   onLoad() {},
+  onShow() {
+    this.getLocation() //获取地理位置
+    this.getBannerList()
+    this.getProductType()
+    this.getRecommendProductList()
+    this.getAboutInfo()
+  },
   methods: {
+    //扫码
     scanCode() {
       uni.scanCode({
         success: (res, r) => {
@@ -121,14 +126,63 @@ export default {
         },
       })
     },
+    //去搜索
     toSearch() {
       uni.navigateTo({
         url: '../search/search',
       })
     },
+    //去选择服务商
     toService() {
       uni.navigateTo({
         url: '../serviceProvider/serviceProvider',
+      })
+    },
+    //获取banner列表
+    getBannerList() {
+      this.Api.other.getBannerList.do().then((res) => {
+        this.list = res
+      })
+    },
+    //获取最近服务商
+    getLatelyProviders(longitude, latitude) {
+      this.Api.provide.getLatelyProviders
+        .do({
+          longitude: longitude,
+          dimension: latitude,
+        })
+        .then((res) => {
+          this.latelyProviders.name = res.name
+          this.latelyProviders.distanceString = res.distanceString
+          this.latelyProviders.image = res.image
+        })
+    },
+    //获取地理位置
+    getLocation() {
+      uni.getLocation({
+        success: (res) => {
+          this.longitude = res.longitude
+          this.latitude = res.latitude
+          this.getLatelyProviders(this.longitude, this.latitude)
+        },
+      })
+    },
+    //获取商品一级分类
+    getProductType() {
+      this.Api.product.getParentGoodTypeList.do().then((res) => {
+        this.shopTypeList = res
+      })
+    },
+    //获取推荐商品列表
+    getRecommendProductList() {
+      this.Api.product.getRecommendGoodsList.do().then((res) => {
+        this.shopList = res
+      })
+    },
+    //获取相关信息
+    getAboutInfo() {
+      this.Api.other.getAboutInfo.do({ type: 3 }).then((res) => {
+        this.aboutUsImage = res.image
       })
     },
   },
@@ -186,7 +240,10 @@ export default {
         width: 80rpx;
         height: 80rpx;
         border-radius: 20rpx;
-        background: #aad;
+        image {
+          width: 80rpx;
+          height: 80rpx;
+        }
       }
       .distance {
         width: 140rpx;
@@ -244,8 +301,12 @@ export default {
   .shop-type {
     margin-top: 30rpx;
     display: flex;
-    justify-content: space-between;
+    // justify-content: space-between;
     align-items: center;
+    overflow-x: auto;
+    .shop-type-list:not(:first-child) {
+      margin-left: 30rpx;
+    }
     .shop-type-list {
       image {
         width: 114rpx;
