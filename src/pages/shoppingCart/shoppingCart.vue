@@ -12,56 +12,76 @@
           <view>清空购物车</view>
         </view>
 
-        <view
-          class="shopCart-list"
-          v-for="(item, index) in list"
-          :key="item.id"
+        <scroll-view
+          scroll-y
+          @scrolltolower="scrollToLower()"
+          :refresher-enabled="isLogin"
+          @refresherrefresh="refreshData()"
+          :refresher-triggered="triggered"
         >
-          <u-swipe-action
-            class="shopCart-item"
-            :show="item.show"
-            :index="index"
-            @click="click"
-            @open="open"
-            :options="options"
-            bg-color="#f5f5f5"
-            btn-width="120"
+          <lazy-list
+            v-model="shopList.loading"
+            :list="shopList.data"
+            :finished="shopList.finished"
+            @load="loadData"
+            proxy
+            ref="lazyList"
+            hideLoadmore
           >
-            <view class="item-center">
+            <view>
               <view
-                class="selector"
-                :class="item.action == 1 ? 'action' : ''"
-                @click="handleSelector(item)"
+                class="shopCart-list"
+                v-for="(item, index) in list"
+                :key="item.id"
               >
-                <view class="round">
-                  <u-icon
-                    v-if="item.action == 1"
-                    name="checkmark"
-                    color="#2EB232"
-                    size="18"
-                  ></u-icon>
-                </view>
-              </view>
-              <view class="img">
-                <image :src="item.images" mode="" />
-              </view>
-              <!-- 此层wrap在此为必写的，否则可能会出现标题定位错误 -->
-              <view class="title-wrap">
-                <text class="title u-line-2">{{ item.title }}</text>
-                <view class="addsub">
-                  <text>¥{{ item.price }}</text>
-                  <u-number-box
-                    :min="1"
-                    size="18"
-                    input-height="35"
-                    :disabled-input="true"
-                    v-model="item.value"
-                  ></u-number-box>
-                </view>
+                <u-swipe-action
+                  class="shopCart-item"
+                  :show="item.show"
+                  :index="index"
+                  @click="click"
+                  @open="open"
+                  :options="options"
+                  bg-color="#f5f5f5"
+                  btn-width="120"
+                >
+                  <view class="item-center">
+                    <view
+                      class="selector"
+                      :class="item.action == 1 ? 'action' : ''"
+                      @click="handleSelector(item)"
+                    >
+                      <view class="round">
+                        <u-icon
+                          v-if="item.action == 1"
+                          name="checkmark"
+                          color="#2EB232"
+                          size="18"
+                        ></u-icon>
+                      </view>
+                    </view>
+                    <view class="img">
+                      <image :src="item.images" mode="" />
+                    </view>
+                    <!-- 此层wrap在此为必写的，否则可能会出现标题定位错误 -->
+                    <view class="title-wrap">
+                      <text class="title u-line-2">{{ item.title }}</text>
+                      <view class="addsub">
+                        <text>¥{{ item.price }}</text>
+                        <u-number-box
+                          :min="1"
+                          size="18"
+                          input-height="35"
+                          :disabled-input="true"
+                          v-model="item.value"
+                        ></u-number-box>
+                      </view>
+                    </view>
+                  </view>
+                </u-swipe-action>
               </view>
             </view>
-          </u-swipe-action>
-        </view>
+          </lazy-list>
+        </scroll-view>
       </view>
     </view>
 
@@ -93,6 +113,8 @@
 export default {
   data() {
     return {
+      isLogin: false,
+      triggered: false,
       list: [
         {
           id: 1,
@@ -189,6 +211,24 @@ export default {
           item.action = 0
         }
       }
+    },
+    scrollToLower() {
+      this.$refs['lazyList'].loadMore()
+    },
+    refreshData() {
+      console.log('自定义下拉刷新被触发')
+    },
+    loadData() {
+      console.log('lazy内load被触发')
+      setTimeout(() => {
+        // for (let i = 0; i < 3; i++) {
+        //   this.shopList.data.push({
+        //     src: shop2,
+        //     name: '双胞胎种猪配合饲料80kg',
+        //     price: '¥200',
+        //   })
+        // }
+      }, 1000)
     },
   },
 }
@@ -304,7 +344,7 @@ export default {
 .opera {
   width: 690rpx;
   height: 100rpx;
-  position: absolute;
+  position: fixed;
   bottom: 55rpx;
   left: 50%;
   transform: translateX(-50%);

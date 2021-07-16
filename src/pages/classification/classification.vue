@@ -61,6 +61,7 @@
         <view class="classify-result">
           <!-- <view class="shop-list"> -->
           <scroll-view
+            style="width: 100%; height: 100%"
             scroll-y
             @scrolltolower="scrollToLower()"
             :refresher-enabled="isLogin"
@@ -146,19 +147,27 @@ export default {
         { image: classify5, name: '设备', width: '40rpx', height: '40rpx' },
       ],
       secondList: [{ id: '', name: '全部', action: 1 }],
+      // scrollViewHeight: '972rpx',
     }
   },
   watch: {
-    searchValue(newVal, oldVal) {
+    searchValue(newValue, oldValue) {
       if (this.searchValue != '') {
         this.clearBtnShow = true
       } else {
         this.clearBtnShow = false
       }
     },
+    // 'shopList.data.length': {
+    //   handler(newValue, oldValue) {
+    //     this.scrollViewHeight = Math.ceil(newValue / 2) * 243 * 2 - 30 + 'rpx'
+    //   },
+    // },
   },
   onShow() {
     this.getProductType()
+    // this.scrollViewHeight =
+    //   Math.ceil(this.shopList.length / 2) * 243 * 2 + 'rpx'
   },
   methods: {
     clearSearch() {
@@ -252,6 +261,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 690rpx;
+  height: 100%;
   margin: 0 auto;
   font-family: 'PingFang SC';
   .classify-top {
