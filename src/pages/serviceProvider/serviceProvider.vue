@@ -21,7 +21,7 @@
           v-for="(item, index) of serviceList"
           :key="index"
           :obj="item"
-          @info="getServiceInfo"
+          @info="getServiceInfo($event, item)"
         ></service-item>
       </view>
     </view>
@@ -46,6 +46,7 @@ export default {
       bgColor: '#f5f5f5',
       serviceList: [
         {
+          action: 0,
           img: shop1,
           name: '西普6号',
           default: 1,
@@ -54,6 +55,7 @@ export default {
             '重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号',
         },
         {
+          action: 0,
           img: shop1,
           name: '西普4号',
           default: 0,
@@ -75,8 +77,13 @@ export default {
     }
   },
   methods: {
-    getServiceInfo(data) {
-      console.log(data)
+    getServiceInfo(data, row) {
+      for (let item of this.serviceList) {
+        if (item.action == 1) {
+          item.action = 0
+        }
+      }
+      row.action = 1
     },
     openAreaSelect() {
       this.areaSelectShow = true

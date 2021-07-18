@@ -6,19 +6,28 @@
         <view class="shopCart-title">购物车</view>
       </view>
 
-      <view class="shopCart-content">
-        <view class="shopCart-title">
-          <view>已选择商品</view>
-          <view>清空购物车</view>
-        </view>
+      <scroll-view
+        v-if="!noData"
+        style="width: 100%; height: 84vh"
+        scroll-y
+        @scrolltolower="scrollToLower()"
+        :refresher-enabled="isLogin"
+        @refresherrefresh="refreshData()"
+        :refresher-triggered="triggered"
+      >
+        <view class="shopCart-content">
+          <view class="shopCart-title">
+            <view>已选择商品</view>
+            <view @click="emptyShopCart">清空购物车</view>
+          </view>
 
-        <scroll-view
+          <!-- <scroll-view
           scroll-y
           @scrolltolower="scrollToLower()"
           :refresher-enabled="isLogin"
           @refresherrefresh="refreshData()"
           :refresher-triggered="triggered"
-        >
+        > -->
           <lazy-list
             v-model="shopList.loading"
             :list="shopList.data"
@@ -28,11 +37,11 @@
             ref="lazyList"
             hideLoadmore
           >
-            <view>
+            <view style="padding-bottom: 10rpx">
               <view
                 class="shopCart-list"
-                v-for="(item, index) in list"
-                :key="item.id"
+                v-for="(item, index) in shopList.data"
+                :key="index"
               >
                 <u-swipe-action
                   class="shopCart-item"
@@ -60,19 +69,21 @@
                       </view>
                     </view>
                     <view class="img">
-                      <image :src="item.images" mode="" />
+                      <image :src="item.img" mode="" />
                     </view>
                     <!-- 此层wrap在此为必写的，否则可能会出现标题定位错误 -->
                     <view class="title-wrap">
-                      <text class="title u-line-2">{{ item.title }}</text>
+                      <text class="title u-line-2">{{ item.name }}</text>
                       <view class="addsub">
-                        <text>¥{{ item.price }}</text>
+                        <text>¥{{ item.money }}</text>
                         <u-number-box
                           :min="1"
+                          :max="99"
                           size="18"
                           input-height="35"
-                          :disabled-input="true"
-                          v-model="item.value"
+                          :disabled-input="false"
+                          v-model="item.num"
+                          @change="changeNum($event, item)"
                         ></u-number-box>
                       </view>
                     </view>
@@ -81,7 +92,12 @@
               </view>
             </view>
           </lazy-list>
-        </scroll-view>
+          <!-- </scroll-view> -->
+        </view>
+      </scroll-view>
+
+      <view v-else class="no-data">
+        <image src="@/static/shop/no_data.png" mode="" />
       </view>
     </view>
 
@@ -99,13 +115,22 @@
       <view class="right">
         <view class="total">
           <text class="label">合计</text>
-          <text class="price">¥{{ priceTotal }}</text>
+          <text class="price" v-if="!noData">¥{{ priceTotal }}</text>
+          <text class="price" v-else style="color: #999">暂无</text>
         </view>
         <view class="btn">
           <button>立即下单</button>
         </view>
       </view>
     </view>
+
+    <u-modal
+      v-model="modalData.show"
+      :content="modalData.content"
+      show-cancel-button
+      :show-title="false"
+      @confirm="confirmEmpty"
+    ></u-modal>
   </app-page>
 </template>
 
@@ -113,7 +138,7 @@
 export default {
   data() {
     return {
-      isLogin: false,
+      isLogin: true,
       triggered: false,
       list: [
         {
@@ -146,6 +171,15 @@ export default {
           show: false,
         },
       ],
+      shopList: {
+        loading: false,
+        finished: false,
+        page: 1,
+        pageSize: 10,
+        typeOneId: '',
+        typeTwoId: '',
+        data: [],
+      },
       selectAll: false, //是否全选
       priceTotal: 0, //合计金额
       disabled: false,
@@ -159,42 +193,75 @@ export default {
           },
         },
       ],
+      noData: false,
+      modalData: {
+        show: false,
+        content: '确认清空购物车？',
+      },
     }
   },
   watch: {
-    list: {
+    'shopList.data': {
       handler(newValue, oldValue) {
-        var data = newValue.filter(function (item) {
-          return item.action == 1
-        })
-        let total = 0
-        for (let item of data) {
-          total += item.price * item.value
+        if (newValue.length == 0) {
+          this.noData = true
+        } else {
+          this.noData = false
+          var data = newValue.filter(function (item) {
+            return item.action == 1
+          })
+          let total = 0
+          for (let item of data) {
+            total += parseFloat(item.money) * item.num
+          }
+          this.priceTotal = total
         }
-        this.priceTotal = total
       },
       deep: true,
     },
   },
+  onLoad() {
+    if (this.shopList.data.length == 0) {
+      this.noData = true
+    } else {
+      this.noData = false
+    }
+    this.loadData()
+  },
   methods: {
+    emptyShopCart() {
+      this.modalData.show = true
+    },
+    confirmEmpty() {
+      this.Api.product.emptyUserShopCar.do().then((res) => {
+        this.shopList.data = []
+      })
+    },
     click(index, index1) {
       if (index1 == 0) {
-        this.list.splice(index, 1)
-        this.$u.toast(`删除了第${index}个cell`)
+        // this.shopList.data.splice(index, 1)
+        // this.$u.toast(`删除了第${index}个cell`)
+        this.Api.product.deleteUserShopCar
+          .do([this.shopList.data[index].id])
+          .then((res) => {
+            console.log(res)
+            this.shopList.data.splice(index, 1)
+            this.$u.toast(`删除成功`)
+          })
       }
     },
     // 如果打开一个的时候，不需要关闭其他，则无需实现本方法
     open(index) {
       // 先将正在被操作的swipeAction标记为打开状态，否则由于props的特性限制，
       // 原本为'false'，再次设置为'false'会无效
-      this.list[index].show = true
-      this.list.map((val, idx) => {
-        if (index != idx) this.list[idx].show = false
+      this.shopList.data[index].show = true
+      this.shopList.data.map((val, idx) => {
+        if (index != idx) this.shopList.data[idx].show = false
       })
     },
     handleSelector(data) {
       data.action = data.action == 1 ? 0 : 1
-      let actions = this.list.map((obj) => {
+      let actions = this.shopList.data.map((obj) => {
         return obj.action
       })
       if (!actions.includes(0)) {
@@ -204,7 +271,7 @@ export default {
       }
     },
     checkboxChange(data) {
-      for (let item of this.list) {
+      for (let item of this.shopList.data) {
         if (data.value) {
           item.action = 1
         } else {
@@ -212,23 +279,47 @@ export default {
         }
       }
     },
+    changeNum(obj, item) {
+      if (obj.value <= 0 || obj.value > 99) {
+        return
+      }
+      const data = {
+        id: item.id,
+        goodId: item.goodId,
+        num: obj.value,
+      }
+      this.Api.product.updateShopCar.do(data).then((res) => {})
+    },
     scrollToLower() {
+      this.shopList.page += 1
       this.$refs['lazyList'].loadMore()
     },
     refreshData() {
-      console.log('自定义下拉刷新被触发')
+      this.shopList.page = 1
+      this.shopList.data = []
     },
     loadData() {
-      console.log('lazy内load被触发')
-      setTimeout(() => {
-        // for (let i = 0; i < 3; i++) {
-        //   this.shopList.data.push({
-        //     src: shop2,
-        //     name: '双胞胎种猪配合饲料80kg',
-        //     price: '¥200',
-        //   })
-        // }
-      }, 1000)
+      this.shopList.loading = true
+      const data = {
+        page: this.shopList.page,
+        pageSize: this.shopList.pageSize,
+      }
+      if (this.shopList.finished) {
+        return
+      }
+      this.Api.product.getUserShopCarList.do(data).then((res) => {
+        this.pageLoading = false
+        this.shopList.loading = false
+        if (res.list.length != 0) {
+          for (let item of res.list) {
+            item.action = 0
+            item.show = false
+            this.shopList.data.push(item)
+          }
+        } else {
+          this.shopList.finished = true
+        }
+      })
     },
   },
 }
@@ -255,6 +346,7 @@ export default {
   }
   .shopCart-content {
     margin-top: 53rpx;
+    padding-bottom: 140rpx;
     .shopCart-title {
       display: flex;
       justify-content: space-between;
@@ -337,6 +429,16 @@ export default {
           }
         }
       }
+    }
+  }
+  .no-data {
+    width: 490rpx;
+    height: 380rpx;
+    margin: 0 auto;
+    margin-top: 160rpx;
+    image {
+      width: 490rpx;
+      height: 380rpx;
     }
   }
 }

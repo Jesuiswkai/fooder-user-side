@@ -1,73 +1,80 @@
 <template>
-  <app-page isTabPage immersiveNav current="1">
+  <app-page isTabPage immersiveNav :loading="pageLoading" current="1">
     <view class="container">
       <view class="classify-top">
         <view></view>
         <view class="classify-title">分类</view>
       </view>
-
-      <view class="search-input">
-        <image class="search-img" src="@/static/public/search.png" mode="" />
-        <input
-          v-model="searchValue"
-          :focus="searchFocus"
-          type="text"
-          placeholder="输入关键词搜索"
-        />
-        <view class="operation">
-          <image
-            v-show="clearBtnShow"
-            class="search-clear"
-            src="@/static/public/clear.png"
-            mode=""
-            @click="clearSearch"
+      <scroll-view
+        style="width: 100%; height: 100vh; padding: 0 30rpx"
+        scroll-y
+        @scrolltolower="scrollToLower()"
+        :refresher-enabled="isLogin"
+        @refresherrefresh="refreshData()"
+        :refresher-triggered="triggered"
+      >
+        <view class="search-input">
+          <image class="search-img" src="@/static/public/search.png" mode="" />
+          <input
+            v-model="searchValue"
+            :focus="searchFocus"
+            type="text"
+            placeholder="输入关键词搜索"
           />
-          <button size="mini">搜索</button>
-        </view>
-      </view>
-
-      <view class="classify-list">
-        <view class="classify-first">
-          <view
-            class="first-item"
-            :class="item.action == 1 ? 'first-item-action' : ''"
-            v-for="(item, index) of firstList"
-            :key="index"
-            @click="selectFirstType(item)"
-          >
-            <view class="first-img">
-              <image
-                :src="item.image"
-                mode=""
-                :style="{ width: item.width, height: item.height }"
-              />
-            </view>
-            <view class="text">{{ item.name }}</view>
+          <view class="operation">
+            <image
+              v-show="clearBtnShow"
+              class="search-clear"
+              src="@/static/public/clear.png"
+              mode=""
+              @click="clearSearch"
+            />
+            <button size="mini">搜索</button>
           </view>
         </view>
-        <view class="classify-second">
-          <view
-            class="second-item"
-            :class="item.action == 1 ? 'second-item-action' : ''"
-            v-for="(item, index) of secondList"
-            :key="index"
-            @click="selectSecondType(item)"
-            >{{ item.name }}</view
-          >
-        </view>
-      </view>
 
-      <view class="classify-content">
-        <view class="classify-result">
-          <!-- <view class="shop-list"> -->
-          <scroll-view
-            style="width: 100%; height: 100%"
+        <view class="classify-list">
+          <view class="classify-first">
+            <view
+              class="first-item"
+              :class="item.action == 1 ? 'first-item-action' : ''"
+              v-for="(item, index) of firstList"
+              :key="index"
+              @click="selectFirstType(item)"
+            >
+              <view class="first-img">
+                <image
+                  :src="item.image"
+                  mode=""
+                  :style="{ width: item.width, height: item.height }"
+                />
+              </view>
+              <view class="text">{{ item.name }}</view>
+            </view>
+          </view>
+          <view class="classify-second">
+            <view
+              class="second-item"
+              :class="item.action == 1 ? 'second-item-action' : ''"
+              v-for="(item, index) of secondList"
+              :key="index"
+              @click="selectSecondType(item)"
+              >{{ item.name }}</view
+            >
+          </view>
+        </view>
+
+        <view class="classify-content">
+          <view class="classify-result">
+            <!-- <view class="shop-list"> -->
+            <!-- <scroll-view
+            style="width: 100%; height: 100vh"
             scroll-y
             @scrolltolower="scrollToLower()"
             :refresher-enabled="isLogin"
             @refresherrefresh="refreshData()"
             :refresher-triggered="triggered"
-          >
+          > -->
             <lazy-list
               v-model="shopList.loading"
               :list="shopList.data"
@@ -87,10 +94,11 @@
                 ></shop-item>
               </view>
             </lazy-list>
-          </scroll-view>
-          <!-- </view> -->
+            <!-- </scroll-view> -->
+            <!-- </view> -->
+          </view>
         </view>
-      </view>
+      </scroll-view>
     </view>
   </app-page>
 </template>
@@ -105,6 +113,8 @@ import classify2 from '@/static/classifycation/classify2.png'
 import classify3 from '@/static/classifycation/classify3.png'
 import classify4 from '@/static/classifycation/classify4.png'
 import classify5 from '@/static/classifycation/classify5.png'
+
+import { mapGetters } from 'vuex'
 export default {
   components: {
     shopItem,
@@ -112,6 +122,7 @@ export default {
   data() {
     return {
       // isLogin: this.$store.getters['auth/isLogin'],
+      pageLoading: true,
       isLogin: true,
       triggered: false,
       clearBtnShow: false, //是否显示清空按钮
@@ -126,11 +137,14 @@ export default {
       shopList: {
         loading: false,
         finished: false,
-        page: 0,
+        page: 1,
+        pageSize: 3,
+        typeOneId: '',
+        typeTwoId: '',
         data: [
-          { src: shop1, name: '双胞胎种猪配合饲料40kg', price: '¥100' },
-          { src: shop2, name: '双胞胎种猪配合饲料60kg', price: '¥150' },
-          { src: shop2, name: '双胞胎种猪配合饲料80kg', price: '¥200' },
+          // { img: shop1, name: '双胞胎种猪配合饲料40kg', money: '¥100' },
+          // { img: shop2, name: '双胞胎种猪配合饲料60kg', money: '¥150' },
+          // { img: shop2, name: '双胞胎种猪配合饲料80kg', money: '¥200' },
         ],
       },
       firstList: [
@@ -158,16 +172,9 @@ export default {
         this.clearBtnShow = false
       }
     },
-    // 'shopList.data.length': {
-    //   handler(newValue, oldValue) {
-    //     this.scrollViewHeight = Math.ceil(newValue / 2) * 243 * 2 - 30 + 'rpx'
-    //   },
-    // },
   },
   onShow() {
     this.getProductType()
-    // this.scrollViewHeight =
-    //   Math.ceil(this.shopList.length / 2) * 243 * 2 + 'rpx'
   },
   methods: {
     clearSearch() {
@@ -175,7 +182,9 @@ export default {
       this.searchFocus = true
     },
     getShopInfo(data) {
-      console.log(data)
+      uni.navigateTo({
+        url: '../productDetail/productDetail?id=' + data.id,
+      })
     },
     //获取商品一级分类
     getProductType() {
@@ -197,11 +206,12 @@ export default {
           parentId: id,
         })
         .then((res) => {
+          this.secondList[0].action = 1
           for (let i = 0; i < res.length; i++) {
             res[i].action = 0
             this.secondList.push(res[i])
           }
-          this.getProductListByType()
+          this.filterProductType()
         })
     },
     //选择一级分类
@@ -214,45 +224,64 @@ export default {
       data.action = 1
       this.getSecondType(data.id)
     },
-    // 选择二级分类
+    //选择二级分类
     selectSecondType(data) {
       for (let item of this.secondList) {
         if (item.action == 1) {
           item.action = 0
         }
-        console.log(item.action)
       }
       data.action = 1
-      this.getProductListByType()
+      this.filterProductType()
     },
-    //根据商品分类获取商品列表
-    getProductListByType() {
-      // this.Api.product.getGoodsList.do()
+    //筛选已选择的分类
+    filterProductType() {
       let firstItem = this.firstList.filter((item) => {
         return item.action == 1
       })
       let secondItem = this.secondList.filter((item) => {
         return item.action == 1
       })
-      console.log(firstItem, secondItem)
+      this.shopList.finished = false
+      this.shopList.page = 1
+      this.shopList.typeOneId = firstItem[0].id
+      this.shopList.typeTwoId = secondItem[0].id
+      this.shopList.data = []
+      this.loadData()
     },
     scrollToLower() {
       this.$refs['lazyList'].loadMore()
+      this.shopList.page += 1
     },
     refreshData() {
-      console.log('自定义下拉刷新被触发')
+      this.triggered = true
+      this.shopList.page = 1
+      this.shopList.data = []
+      this.loadData(1)
     },
-    loadData() {
-      console.log('lazy内load被触发')
-      setTimeout(() => {
-        for (let i = 0; i < 3; i++) {
-          this.shopList.data.push({
-            src: shop2,
-            name: '双胞胎种猪配合饲料80kg',
-            price: '¥200',
-          })
+    loadData(a) {
+      this.shopList.loading = true
+      const data = {
+        page: this.shopList.page,
+        pageSize: this.shopList.pageSize,
+        typeOneId: this.shopList.typeOneId,
+        typeTwoId: this.shopList.typeTwoId,
+      }
+      if (this.shopList.finished) {
+        return
+      }
+      this.Api.product.getGoodsList.do(data).then((res) => {
+        this.pageLoading = false
+        this.shopList.loading = false
+        if (res.list.length != 0) {
+          for (let item of res.list) {
+            this.shopList.data.push(item)
+          }
+        } else {
+          this.shopList.finished = true
         }
-      }, 1000)
+        if (a) this.triggered = false
+      })
     },
   },
 }
@@ -260,9 +289,10 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  width: 690rpx;
+  width: 100%;
   height: 100%;
   margin: 0 auto;
+  // padding: 0 30rpx;
   font-family: 'PingFang SC';
   .classify-top {
     // height: 188rpx;

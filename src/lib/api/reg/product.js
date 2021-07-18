@@ -22,7 +22,7 @@ export default {
     public: true
   }),
 
-  // 根据名称获取商品列表（首页搜索接口）
+  // 根据名称获取商品列表（搜索接口）
   getGoodsListByName: new Api({
     url: '/goods/getGoodsListByName',
     method: 'post',
@@ -81,6 +81,13 @@ export default {
   // 清空购物车
   emptyUserShopCar: new Api({
     url: '/shopCar/emptyUserShopCar',
+    method: 'get',
+    public: true
+  }),
+
+  // 获取用户购物车数量
+  userShopCarCount: new Api({
+    url: '/shopCar/userShopCarCount',
     method: 'get',
     public: true
   })

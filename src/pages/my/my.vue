@@ -81,6 +81,14 @@ export default {
       ],
     }
   },
+  onShow() {
+    let isLogin = this.$store.getters['auth/isLogin']
+    if (!isLogin) {
+      uni.navigateTo({
+        url: '../login/login',
+      })
+    }
+  },
 }
 </script>
 

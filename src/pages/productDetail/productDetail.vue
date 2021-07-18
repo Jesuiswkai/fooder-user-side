@@ -2,7 +2,7 @@
   <app-page immersiveNav>
     <view class="top">
       <u-swiper
-        :list="list"
+        :list="productInfo.imageList"
         mode="number"
         indicator-pos="bottomRight"
         height="750"
@@ -11,12 +11,12 @@
 
     <view class="shop-info">
       <view class="shop-title">
-        <view class="shop-name">¥150</view>
-        <view class="shop-price">双胞胎种猪配合饲料40kg</view>
+        <view class="shop-name">¥{{ productInfo.money }}</view>
+        <view class="shop-price">{{ productInfo.name }}</view>
       </view>
 
       <view class="shop-content">
-        <u-parse :html="content"></u-parse>
+        <u-parse :html="productInfo.desc"></u-parse>
       </view>
     </view>
 
@@ -24,9 +24,14 @@
       <view class="opera-btn">
         <view class="car-img">
           <image src="@/static/shop/car.png" mode="" />
-          <!-- <u-badge type="error" count="190"></u-badge> -->
+          <u-badge
+            type="error"
+            :count="shopCarCount"
+            :offset="[-10, -22]"
+            size="mini"
+          ></u-badge>
         </view>
-        <button class="join">加入购物车</button>
+        <button class="join" @click="joinShopCart">加入购物车</button>
         <button class="order">立即下单</button>
       </view>
     </view>
@@ -37,44 +42,48 @@
 export default {
   data() {
     return {
-      list: [
-        {
-          image: 'https://cdn.uviewui.com/uview/swiper/1.jpg',
-          title: '昨夜星辰昨夜风，画楼西畔桂堂东',
-        },
-        {
-          image: 'https://cdn.uviewui.com/uview/swiper/2.jpg',
-          title: '身无彩凤双飞翼，心有灵犀一点通',
-        },
-        {
-          image: 'https://cdn.uviewui.com/uview/swiper/3.jpg',
-          title: '谁念西风独自凉，萧萧黄叶闭疏窗，沉思往事立残阳',
-        },
-      ],
-      content: `
-      <div>肾宝，味道好极了</div>
-      <p>露从今夜白，月是故乡明</p>
-			<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" style="width:100px;height:100px" />
-      <div>肾宝，味道好极了</div>
-      <p>露从今夜白，月是故乡明</p>
-			<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" style="width:100px;height:100px" />
-      <div>肾宝，味道好极了</div>
-      <p>露从今夜白，月是故乡明</p>
-			<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" style="width:100px;height:100px" />
-      <div>肾宝，味道好极了</div>
-      <p>露从今夜白，月是故乡明</p>
-			<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" style="width:100px;height:100px" />
-      <div>肾宝，味道好极了</div>
-      <p>露从今夜白，月是故乡明</p>
-			<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" style="width:100px;height:100px" />
-      <div>肾宝，味道好极了</div>
-      <p>露从今夜白，月是故乡明</p>
-			<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" style="width:100px;height:100px" />
-      <div>肾宝，味道好极了</div>
-      <p>露从今夜白，月是故乡明</p>
-			<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" style="width:100px;height:100px" />
-      `,
+      id: null,
+      productInfo: {
+        imageList: [],
+        money: '',
+        name: '',
+        desc: '',
+      },
+      shopCarCount: 0,
     }
+  },
+  onLoad(data) {
+    this.id = data.id
+    this.getGoodsInfo(data)
+    this.getShopCarCount()
+  },
+  methods: {
+    getGoodsInfo(data) {
+      this.Api.product.getGoodsInfo.do(data).then((res) => {
+        for (let obj in this.productInfo) {
+          this.productInfo[obj] = res[obj]
+        }
+      })
+    },
+    getShopCarCount() {
+      this.Api.product.userShopCarCount.do().then((res) => {
+        this.shopCarCount = res.count
+      })
+    },
+    joinShopCart() {
+      this.Api.product.saveShopCar
+        .do({
+          goodId: this.id,
+          num: 1,
+        })
+        .then((res) => {
+          uni.showToast({
+            title: '加入购物车成功',
+            icon: 'none',
+          })
+          this.getShopCarCount()
+        })
+    },
   },
 }
 </script>
@@ -122,6 +131,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     .car-img {
+      position: relative;
       width: 70rpx;
       height: 70rpx;
       image {

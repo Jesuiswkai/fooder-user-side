@@ -1,5 +1,9 @@
 <template>
-  <view class="service" @click="clickService">
+  <view
+    class="service"
+    :class="obj.action == 1 ? 'action' : ''"
+    @click="clickService"
+  >
     <view class="service-img">
       <image :src="obj.img" mode="" />
     </view>
@@ -10,6 +14,9 @@
       </view>
       <view class="distance">距离{{ obj.distance }}km</view>
       <view class="address">{{ obj.address }}</view>
+    </view>
+    <view v-show="obj.action == 1" class="action">
+      <image src="@/static/public/sel_pro.png" mode="" />
     </view>
   </view>
 </template>
@@ -35,6 +42,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.service.action {
+  border: 2rpx solid #2eb232;
+}
 .service {
   padding: 20rpx;
   display: flex;
@@ -43,6 +53,7 @@ export default {
   background: #fff;
   border-radius: 20rpx;
   margin-bottom: 30rpx;
+  position: relative;
   .service-img {
     width: 160rpx;
     height: 160rpx;
@@ -89,6 +100,18 @@ export default {
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
+    }
+  }
+  .action {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 30rpx;
+    height: 118rpx;
+    image {
+      width: 30rpx;
+      height: 118rpx;
     }
   }
 }

@@ -20,7 +20,6 @@ export async function request({
   }
   method = method.toUpperCase()
   url = process.env.VUE_APP_apiBaseURL + url
-  console.log('请求url', url)
   try {
     let [error, res] = await uni.request({
       method,
@@ -30,12 +29,10 @@ export async function request({
     })
 
     if (error) {
-      console.log('错误', error)
       rst = error
       throw rst
     } else {
       rst = res
-      console.log(rst)
       if (rst.statusCode !== 200) {
         if (rst.statusCode === 401) {
           store.commit('auth/logout')
@@ -56,7 +53,6 @@ export async function request({
       }
     }
   } catch (error) {
-    console.log('请求错误', error)
     throw error
   }
 

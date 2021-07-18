@@ -91,7 +91,7 @@ export default {
       bgColor: '#f5f5f5',
       clearBtnShow: false, //是否显示清空按钮
       searchFocus: false, //是否获取焦点
-      hotAndHistory: false, //是否显示历史和热门搜索
+      hotAndHistory: true, //是否显示历史和热门搜索
       searchValue: '',
       historySearchList: ['猪饲料', '鸡饲料', '保健品', '饲养设备 猪食槽'],
       hotSearchList: [
@@ -100,9 +100,9 @@ export default {
         { text: '黄羽肉鸡混合饲料' },
       ],
       shopList: [
-        { src: shop1, name: '双胞胎种猪配合饲料40kg', price: '¥150' },
-        { src: shop2, name: '双胞胎种猪配合饲料40kg', price: '¥150' },
-        { src: shop2, name: '双胞胎种猪配合饲料40kg', price: '¥150' },
+        { img: shop1, name: '双胞胎种猪配合饲料40kg', money: '150' },
+        { img: shop2, name: '双胞胎种猪配合饲料40kg', money: '150' },
+        { img: shop2, name: '双胞胎种猪配合饲料40kg', money: '150' },
       ],
     }
   },

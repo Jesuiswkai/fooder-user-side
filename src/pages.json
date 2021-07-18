@@ -1,9 +1,33 @@
 {
   "pages": [
     {
-      "path": "pages/classification/classification",
+      "path": "pages/order/order",
       "style": {
-        "navigationBarTitleText": "分类"
+        "navigationBarTitleText": "确认下单"
+      }
+    },
+    {
+      "path": "pages/personalData/personalData",
+      "style": {
+        "navigationBarTitleText": "个人资料"
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
+      "path": "pages/serviceProvider/serviceProvider",
+      "style": {
+        "navigationBarTitleText": "选择服务商"
+      }
+    },
+    {
+      "path": "pages/shoppingCart/shoppingCart",
+      "style": {
+        "navigationBarTitleText": "购物车"
       }
     },
     {
@@ -13,15 +37,27 @@
       }
     },
     {
-      "path": "pages/testPay/testPay",
+      "path": "pages/classification/classification",
       "style": {
-        "navigationBarTitleText": "支付测试"
+        "navigationBarTitleText": "分类"
       }
     },
     {
-      "path": "pages/index/index",
+      "path": "pages/search/search",
       "style": {
-        "navigationBarTitleText": "首页"
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
+      "path": "pages/productDetail/productDetail",
+      "style": {
+        "navigationBarTitleText": "商品详情"
+      }
+    },
+    {
+      "path": "pages/testPay/testPay",
+      "style": {
+        "navigationBarTitleText": "支付测试"
       }
     },
     {
@@ -34,12 +70,6 @@
       "path": "pages/paymentSuccessful/paymentSuccessful",
       "style": {
         "navigationBarTitleText": "支付成功"
-      }
-    },
-    {
-      "path": "pages/shoppingCart/shoppingCart",
-      "style": {
-        "navigationBarTitleText": "购物车"
       }
     },
     {
@@ -91,33 +121,9 @@
       }
     },
     {
-      "path": "pages/order/order",
-      "style": {
-        "navigationBarTitleText": "确认下单"
-      }
-    },
-    {
       "path": "pages/myOrder/myOrder",
       "style": {
         "navigationBarTitleText": "我的订单"
-      }
-    },
-    {
-      "path": "pages/productDetail/productDetail",
-      "style": {
-        "navigationBarTitleText": "商品详情"
-      }
-    },
-    {
-      "path": "pages/search/search",
-      "style": {
-        "navigationBarTitleText": "搜索"
-      }
-    },
-    {
-      "path": "pages/serviceProvider/serviceProvider",
-      "style": {
-        "navigationBarTitleText": "选择服务商"
       }
     }
   ],

@@ -1,8 +1,8 @@
 <template>
   <view class="shop" @click="clickShop">
-    <image :src="obj.src" mode="" />
+    <image :src="obj.img" mode="" />
     <view class="shop-name">{{ obj.name }}</view>
-    <view class="shop-price">{{ obj.price }}</view>
+    <view class="shop-price">¥{{ obj.money }}</view>
   </view>
 </template>
 
