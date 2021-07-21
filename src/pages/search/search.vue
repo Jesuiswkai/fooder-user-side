@@ -4,10 +4,11 @@
       <view class="search-input">
         <image class="search-img" src="@/static/public/search.png" mode="" />
         <input
-          v-model="searchValue"
+          v-model="shopList.name"
           :focus="searchFocus"
           type="text"
           placeholder="输入关键词搜索"
+          confirm-type="search"
         />
         <view class="operation">
           <image
@@ -16,120 +17,242 @@
             src="@/static/public/clear.png"
             mode=""
             @click="clearSearch"
+            @confirm="resetSearch"
           />
-          <button size="mini">搜索</button>
+          <button size="mini" @click="resetSearch">搜索</button>
         </view>
       </view>
 
-      <view class="search-content">
-        <!--搜索历史&热门搜索-->
-        <view v-show="hotAndHistory" class="hot-history">
-          <!--搜索历史-->
-          <view class="his">
-            <view class="his-title">
-              <view class="text">搜索历史</view>
-              <image src="@/static/public/trash.png" mode="" />
-            </view>
-            <view class="his-content">
-              <view class="his-list">
-                <view
-                  class="his-item"
-                  v-for="(item, index) of historySearchList"
-                  :key="index"
-                  >{{ item }}</view
-                >
+      <scroll-view
+        style="width: 100%; height: 82vh"
+        scroll-y
+        @scrolltolower="scrollToLower()"
+        :refresher-enabled="isLogin"
+        @refresherrefresh="refreshData()"
+        :refresher-triggered="triggered"
+      >
+        <view class="search-content">
+          <!--搜索历史&热门搜索-->
+          <view v-show="hotAndHistory" class="hot-history">
+            <!--搜索历史-->
+            <view class="his">
+              <view class="his-title">
+                <view class="text">搜索历史</view>
+                <image
+                  src="@/static/public/trash.png"
+                  mode=""
+                  @click="emptyHis"
+                />
+              </view>
+              <view class="his-content">
+                <view class="his-list">
+                  <view
+                    class="his-item"
+                    v-for="(item, index) of historySearchList"
+                    :key="index"
+                    @click="hotAndHisSearch(item)"
+                    >{{ item }}</view
+                  >
+                </view>
               </view>
             </view>
-          </view>
 
-          <!--热门搜索-->
-          <view class="hot">
-            <view class="hot-title">
-              <view class="text">热门搜索</view>
-            </view>
-            <view class="hot-content">
-              <view class="hot-list">
-                <view
-                  class="hot-item"
-                  v-for="(item, index) of hotSearchList"
-                  :key="index"
-                >
-                  <view class="text">{{ item.text }}</view>
-                  <image src="@/static/public/right.png" mode="" />
+            <!--热门搜索-->
+            <view class="hot">
+              <view class="hot-title">
+                <view class="text">热门搜索</view>
+              </view>
+              <view class="hot-content">
+                <view class="hot-list">
+                  <view
+                    class="hot-item"
+                    v-for="(item, index) of hotSearchList"
+                    :key="index"
+                    @click="hotAndHisSearch(item.text)"
+                  >
+                    <view class="text">{{ item.text }}</view>
+                    <image src="@/static/public/right.png" mode="" />
+                  </view>
                 </view>
               </view>
             </view>
           </view>
-        </view>
 
-        <view v-show="!hotAndHistory" class="search-result">
-          <view class="shop-list">
-            <shop-item
-              class="shop-item"
-              v-for="(item, index) of shopList"
-              :key="index"
-              :obj="item"
-              @info="getShopInfo"
-            ></shop-item>
+          <view v-show="!hotAndHistory" class="search-result">
+            <lazy-list
+              v-model="shopList.loading"
+              :list="shopList.data"
+              :finished="shopList.finished"
+              @load="search"
+              proxy
+              ref="lazyList"
+              hideLoadmore
+            >
+              <view class="shop-list">
+                <shop-item
+                  class="shop-item"
+                  v-for="(item, index) of shopList.data"
+                  :key="index"
+                  :obj="item"
+                  @info="getShopInfo"
+                ></shop-item>
+              </view>
+            </lazy-list>
           </view>
         </view>
-      </view>
+      </scroll-view>
     </view>
+
+    <u-modal
+      v-model="modalData.show"
+      :content="modalData.content"
+      show-cancel-button
+      :show-title="false"
+      @confirm="confirmEmpty"
+    ></u-modal>
   </app-page>
 </template>
 
 <script>
 import shopItem from '@/components/ShopItem/index.vue'
-import shop1 from '@/static/index/shop1.png'
-import shop2 from '@/static/index/shop2.png'
+import { mapState } from 'vuex'
 export default {
   components: {
     shopItem,
   },
   data() {
     return {
+      isLogin: false,
+      triggered: false,
       bgColor: '#f5f5f5',
       clearBtnShow: false, //是否显示清空按钮
       searchFocus: false, //是否获取焦点
       hotAndHistory: true, //是否显示历史和热门搜索
-      searchValue: '',
-      historySearchList: ['猪饲料', '鸡饲料', '保健品', '饲养设备 猪食槽'],
-      hotSearchList: [
-        { text: '生长猪浓缩饲料' },
-        { text: '高档乳猪配合饲料' },
-        { text: '黄羽肉鸡混合饲料' },
-      ],
-      shopList: [
-        { img: shop1, name: '双胞胎种猪配合饲料40kg', money: '150' },
-        { img: shop2, name: '双胞胎种猪配合饲料40kg', money: '150' },
-        { img: shop2, name: '双胞胎种猪配合饲料40kg', money: '150' },
-      ],
+      hotSearchList: [],
+      shopList: {
+        loading: false,
+        finished: true,
+        name: '',
+        page: 1,
+        pageSize: 3,
+        data: [],
+      },
+      modalData: {
+        show: false,
+        content: '确认删除全部历史记录？',
+      },
     }
   },
+  computed: {
+    ...mapState({
+      historySearchList: (state) => state.other.searchHistory,
+    }),
+  },
   watch: {
-    searchValue(newVal, oldVal) {
-      if (this.searchValue != '') {
-        this.clearBtnShow = true
-      } else {
-        this.clearBtnShow = false
-      }
+    'shopList.name': {
+      handler(newVal, oldVal) {
+        if (newVal != '') {
+          this.clearBtnShow = true //清空按钮显示
+          this.hotAndHistory = false //搜索历史显示
+          this.isLogin = true //下拉刷新开启
+          this.shopList.finished = false //下拉不请求
+        } else {
+          this.clearBtnShow = false
+          this.hotAndHistory = true
+          this.isLogin = false
+          this.shopList.finished = true
+          this.shopList.data = []
+        }
+      },
     },
+  },
+  onShow() {
+    this.hotWordsList()
   },
   methods: {
     clearSearch() {
-      this.searchValue = ''
+      this.shopList.name = ''
       this.searchFocus = true
     },
     getShopInfo(data) {
       console.log(data)
+    },
+    emptyHis() {
+      this.modalData.show = true
+    },
+    confirmEmpty() {
+      this.$store.commit('other/emptySh')
+    },
+    //获取热门搜索
+    hotWordsList() {
+      this.Api.product.hotWordsList.do().then((res) => {
+        for (let item of res) {
+          let obj = {}
+          obj.text = item
+          this.hotSearchList.push(obj)
+        }
+      })
+    },
+    //点击热门和历史搜索
+    hotAndHisSearch(name) {
+      this.shopList.name = name
+      this.shopList.page = 1
+      this.shopList.finished = false
+      this.search()
+    },
+    scrollToLower() {
+      this.shopList.page += 1
+      this.$refs['lazyList'].loadMore()
+    },
+    refreshData() {
+      this.triggered = true
+      this.shopList.page = 1
+      this.shopList.data = []
+    },
+    resetSearch() {
+      this.shopList.finished = false
+      this.shopList.page = 1
+      this.shopList.data = []
+      this.search()
+    },
+    search() {
+      this.shopList.loading = true
+      const data = {
+        name: this.shopList.name,
+        page: this.shopList.page,
+        pageSize: this.shopList.pageSize,
+      }
+      console.log(this.shopList.finished)
+      if (this.shopList.finished || data.name == '') {
+        this.shopList.loading = false
+        return
+      }
+      this.Api.product.getGoodsListByName.do(data).then((res) => {
+        this.pageLoading = false
+        this.shopList.loading = false
+        this.$store.commit('other/setsh', data.name)
+        console.log(this.$store.getters['other/getsh'])
+        if (res.list.length != 0) {
+          for (let item of res.list) {
+            this.shopList.data.push(item)
+          }
+        } else {
+          this.shopList.finished = true
+        }
+      })
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.container::before {
+  display: table;
+  content: '';
+}
 .container {
   width: 690rpx;
+  height: 100%;
   margin: 0 auto;
   font-family: 'PingFang SC';
   .search-input {

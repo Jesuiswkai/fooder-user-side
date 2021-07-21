@@ -6,7 +6,7 @@
         <view class="classify-title">分类</view>
       </view>
       <scroll-view
-        style="width: 100%; height: 100vh; padding: 0 30rpx"
+        style="width: 100%; height: 84vh; padding: 0 30rpx"
         scroll-y
         @scrolltolower="scrollToLower()"
         :refresher-enabled="isLogin"
@@ -138,7 +138,7 @@ export default {
         loading: false,
         finished: false,
         page: 1,
-        pageSize: 3,
+        pageSize: 10,
         typeOneId: '',
         typeTwoId: '',
         data: [
@@ -173,13 +173,13 @@ export default {
       }
     },
   },
-  onShow() {
+  onLoad() {
     this.getProductType()
   },
   methods: {
     clearSearch() {
       this.searchValue = ''
-      this.searchFocus = true
+      // this.searchFocus = true
     },
     getShopInfo(data) {
       uni.navigateTo({
@@ -250,16 +250,18 @@ export default {
       this.loadData()
     },
     scrollToLower() {
-      this.$refs['lazyList'].loadMore()
       this.shopList.page += 1
+      this.$refs['lazyList'].loadMore()
     },
     refreshData() {
-      this.triggered = true
+      if (!this.triggered) {
+        this.triggered = true
+      }
       this.shopList.page = 1
       this.shopList.data = []
-      this.loadData(1)
+      this.loadData()
     },
-    loadData(a) {
+    loadData() {
       this.shopList.loading = true
       const data = {
         page: this.shopList.page,
@@ -273,6 +275,7 @@ export default {
       this.Api.product.getGoodsList.do(data).then((res) => {
         this.pageLoading = false
         this.shopList.loading = false
+        this.triggered = false
         if (res.list.length != 0) {
           for (let item of res.list) {
             this.shopList.data.push(item)
@@ -280,7 +283,6 @@ export default {
         } else {
           this.shopList.finished = true
         }
-        if (a) this.triggered = false
       })
     },
   },

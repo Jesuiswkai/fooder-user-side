@@ -32,7 +32,7 @@
           ></u-badge>
         </view>
         <button class="join" @click="joinShopCart">加入购物车</button>
-        <button class="order">立即下单</button>
+        <button class="order" @click="orderNow">立即下单</button>
       </view>
     </view>
   </app-page>
@@ -44,6 +44,7 @@ export default {
     return {
       id: null,
       productInfo: {
+        id: '',
         imageList: [],
         money: '',
         name: '',
@@ -83,6 +84,18 @@ export default {
           })
           this.getShopCarCount()
         })
+    },
+    orderNow() {
+      const data = {
+        providersId: this.$store.getters['other/getProvider'].id,
+        pickWay: 1,
+        goods: [{ goodsId: this.productInfo.id, num: 1 }],
+      }
+      this.Api.order.orderNow.do(data).then((res) => {
+        uni.navigateTo({
+          url: '../order/order?previewData=' + res,
+        })
+      })
     },
   },
 }

@@ -26,4 +26,4 @@ export default {
       default: '100%'
     }
   }
-};
+}

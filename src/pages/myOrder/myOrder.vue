@@ -10,41 +10,47 @@
     <view class="container">
       <view class="card" v-for="(item, index) of orderList" :key="index">
         <view class="card-top">
-          <view class="left">{{ item.time }}</view>
+          <view class="left">{{ item.createTime }}</view>
           <view class="right">
-            <text v-if="item.type == 1" style="color: #ff2424"
+            <text v-if="item.status == 1" style="color: #ff2424"
               >未支付，请及时处理</text
             >
-            <text v-else-if="item.type == 2" style="color: #24afff"
+            <text v-else-if="item.status == 2" style="color: #24afff"
               >商品准备中</text
             >
-            <text v-else-if="item.type == 3" style="color: #24afff"
+            <text v-else-if="item.status == 3" style="color: #24afff"
               >商品配送中</text
             >
-            <text v-else-if="item.type == 4" style="color: #98d288"
+            <text v-else-if="item.status == 4" style="color: #98d288"
               >已完成</text
             >
             <text v-else style="color: #999999">已取消</text>
           </view>
         </view>
-        <view class="card-center">
-          <view class="info-list" v-for="info of item.list" :key="item.code">
-            <image src="@/static/index/shop1.png" mode="" />
+        <view class="card-center" @click="toDetail(item)">
+          <view
+            class="info-list"
+            v-for="info of item.goods"
+            :key="item.goodsId"
+          >
+            <image :src="info.goodsImg" mode="" />
             <view class="info">
-              <view class="name">{{ info.name }}</view>
+              <view class="name">{{ info.goodsName }}</view>
               <view class="other">
-                <text>¥{{ info.price }}</text>
-                <text>X{{ info.spec }}包</text>
+                <text>¥{{ info.goodsPrice }}</text>
+                <text>X{{ info.goodsNum }}包</text>
               </view>
             </view>
           </view>
         </view>
         <view class="card-bottom">
-          <button class="cancel" v-if="item.type == 1">取消订单</button>
+          <button class="cancel" v-if="item.status == 1">取消订单</button>
           <button class="confirm">
-            <text v-if="item.type == 1">去付款</text>
-            <text v-else-if="item.type == 2 || item.type == 3">确认收货</text>
-            <text v-else-if="item.type == 4">查看订单</text>
+            <text v-if="item.status == 1">去付款</text>
+            <text v-else-if="item.status == 2 || item.status == 3"
+              >确认收货</text
+            >
+            <text v-else-if="item.status == 4">查看订单</text>
             <text v-else>再次购买</text>
           </button>
         </view>
@@ -85,55 +91,30 @@ export default {
         },
       ],
       current: 0,
-      orderList: [
-        {
-          type: 1,
-          code: 2,
-          time: '2021.06.30 10:49:52',
-          list: [
-            {
-              code: 1,
-              url: '',
-              name: '双胞胎种猪配合饲料40kg',
-              price: '150',
-              spec: '1',
-            },
-          ],
-        },
-        {
-          code: 2,
-          type: 2,
-          time: '2021.06.30 10:49:52',
-          list: [
-            {
-              code: 1,
-              url: '',
-              name: '双胞胎种猪配合饲料40kg',
-              price: '150',
-              spec: '1',
-            },
-            {
-              code: 1,
-              url: '',
-              name: '双胞胎种猪配合饲料40kg',
-              price: '150',
-              spec: '1',
-            },
-            {
-              code: 1,
-              url: '',
-              name: '双胞胎种猪配合饲料40kg',
-              price: '150',
-              spec: '1',
-            },
-          ],
-        },
-      ],
+      orderList: [],
     }
+  },
+  mounted() {
+    this.getMyOrderList()
   },
   methods: {
     change(index) {
       this.current = index
+      this.getMyOrderList()
+    },
+    // 获取订单列表
+    getMyOrderList() {
+      this.Api.order.myOrderList
+        .do({ status: this.current, page: 1, pageSize: 100 })
+        .then((res) => {
+          this.orderList = res.list
+        })
+    },
+    // 去订单详情
+    toDetail(data) {
+      uni.navigateTo({
+        url: '../orderDetail/orderDetail?orderNum=' + data.orderNum,
+      })
     },
   },
 }

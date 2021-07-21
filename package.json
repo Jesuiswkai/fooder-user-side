@@ -62,6 +62,7 @@
     "@dcloudio/uni-stat": "^2.0.0-31920210709003",
     "@vue/shared": "^3.1.4",
     "core-js": "^3.15.2",
+    "element-china-area-data": "^5.0.2",
     "flyio": "^0.6.2",
     "js-md5": "^0.7.3",
     "moment": "^2.29.1",

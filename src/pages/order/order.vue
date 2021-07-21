@@ -9,7 +9,7 @@
         </view>
 
         <view class="service-content">
-          <service-item :obj="obj"></service-item>
+          <service-item :obj="providerObj"></service-item>
         </view>
       </view>
 
@@ -21,10 +21,62 @@
 
         <view class="distribute-content">
           <view class="tab">
-            <view class="fixed">门店自提</view>
-            <view class="mobile">线上配送</view>
+            <view
+              class="fixed"
+              :class="tabShow ? 'action' : ''"
+              @click="switchDispath(1)"
+              >门店自提</view
+            >
+            <view
+              class="mobile"
+              :class="!tabShow ? 'action' : ''"
+              @click="switchDispath(0)"
+              >线上配送</view
+            >
           </view>
-          <view class="center"></view>
+          <view class="center">
+            <!--门店自提-->
+            <view v-show="tabShow" class="fixed-content">
+              <view class="item">
+                <view>陈锐</view>
+                <view class="info">
+                  <text>18002334272</text>
+                  <image src="@/static/public/right.png" mode="" />
+                </view>
+              </view>
+              <view class="item">
+                <view>预计自提时间</view>
+                <view class="info">
+                  <text>2021.06.29</text>
+                  <image
+                    src="@/static/public/date_time.png"
+                    mode=""
+                    style="width: 20rpx; height: 20rpx"
+                  />
+                </view>
+              </view>
+            </view>
+            <!--线上配送-->
+            <view v-show="!tabShow" class="mobile-content">
+              <view class="dis-item">
+                <view class="info">
+                  <view>陈锐</view>
+                  <view class="phone">
+                    <text>18002334272</text>
+                    <image src="@/static/public/right.png" mode="" />
+                  </view>
+                </view>
+                <view class="address">重庆市江北区西普大厦10-1</view>
+              </view>
+              <view class="item">
+                <view>期望配送时间</view>
+                <view class="info">
+                  <text>2021.06.29</text>
+                  <image src="@/static/public/date_time.png" mode="" />
+                </view>
+              </view>
+            </view>
+          </view>
         </view>
       </view>
 
@@ -36,18 +88,29 @@
 
         <view class="order-content">
           <view class="order-info">
-            <shop-order :obj="shopObj"></shop-order>
+            <view
+              v-for="(shopObj, index) of shopObjs"
+              :key="index"
+              :class="index != 0 ? 'marginTop' : ''"
+            >
+              <shop-order :obj="shopObj"></shop-order>
+            </view>
             <view style="margin-top: 20rpx">
               <shop-list :list="shopList"></shop-list>
             </view>
-            <view class="coupon">
+            <view class="coupon" @click="toSelectCoupon">
               <view class="name">优惠券</view>
               <view class="info">
-                <view class="price">
+                <view v-show="selectedCoupon" class="price">
                   <text>-</text>
                   <text>¥</text>
-                  <text>10.00</text>
+                  <text>{{ selectedCoupon.priceStr }}</text>
                 </view>
+                <view
+                  v-show="!selectedCoupon"
+                  style="font-size: 24rpx; font-weight: 400; color: #999999"
+                  >请选择优惠券</view
+                >
                 <image src="@/static/public/right.png" mode="" />
               </view>
             </view>
@@ -66,9 +129,9 @@
       <view class="opera-btn">
         <view class="price">
           <text class="key">待支付：</text>
-          <text class="value">¥130.00</text>
+          <text class="value">¥{{ nowPrice }}</text>
         </view>
-        <button class="pay">立即下单</button>
+        <button class="pay" @click="pay">立即下单</button>
       </view>
     </view>
 
@@ -117,7 +180,7 @@
 import serviceItem from '@/components/ServiceItem/index.vue'
 import shopOrder from '@/components/ShopOrder/index.vue'
 import shopList from '@/components/ShopList/index.vue'
-import shop1 from '@/static/index/shop1.png'
+import { mapState } from 'vuex'
 export default {
   components: {
     serviceItem,
@@ -127,24 +190,22 @@ export default {
   data() {
     return {
       bgColor: '#f5f5f5',
-      obj: {
-        img: shop1,
+      providerObj: {
+        id: '',
+        image: '',
         name: '西普6号',
-        default: 1,
-        distance: '2.80',
-        address:
+        isDefault: 1,
+        distanceString: '2.80km',
+        addressDetail:
           '重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号',
       },
-      shopObj: {
-        url: shop1,
-        name: '双胞胎种猪配合饲料40kg',
-        price: '¥150',
-        specs: 'X1包',
-      },
+      shopObjs: [],
       shopList: [
-        { name: '商品金额', price: '150.00', orange: 0, minus: 0 },
-        { name: '自提优惠', price: '150.00', orange: 1, minus: 1 },
+        { name: '商品金额', price: '0', orange: 0, minus: 0 },
+        // { name: '自提优惠', price: '0', orange: 1, minus: 1 },
       ],
+      nowPrice: '0', //现价
+      couponList: [], //优惠券列表
       modalData: {
         show: false,
         type: 2,
@@ -157,7 +218,41 @@ export default {
           { name: '陈锐', phone: '17623563437' },
         ],
       },
+      tabShow: true,
+      deliveryMethod: {
+        //自提
+        submit: {},
+        //线上
+        onLine: {},
+      },
     }
+  },
+  computed: {
+    ...mapState({
+      selectedCoupon: (state) => state.other.coupon,
+    }),
+  },
+  watch: {
+    selectedCoupon: {
+      handler(newVal, oldVal) {
+        if (newVal) {
+          this.calcOrderPrice(newVal.id)
+        }
+      },
+      deep: true,
+    },
+  },
+  onLoad(data) {
+    if (data.previewData) {
+      this.updateOrderInfo(JSON.parse(data.previewData))
+    }
+  },
+  onShow() {
+    const providerInfo = this.$store.getters['other/getProvider']
+    this.updateProvider(providerInfo)
+  },
+  onUnload() {
+    this.$store.commit('other/emptyCoupon')
   },
   methods: {
     cancel() {
@@ -174,11 +269,138 @@ export default {
       }
       this.$set(data, 'action', 1)
     },
+    //更新服务商
+    updateProvider(data) {
+      // 服务商
+      for (let obj in this.providerObj) {
+        this.providerObj[obj] = data[obj]
+      }
+      this.providerObj.isDefault = 1
+    },
+    //切换配送方式
+    switchDispath(status) {
+      this.tabShow = status == 1 ? true : false
+      this.calcOrderPrice()
+    },
+    //计算订单价格
+    calcOrderPrice(conponId) {
+      const goods = []
+      for (let item of this.shopObjs) {
+        let obj = {
+          goodsId: item.id,
+          num: item.num,
+        }
+        goods.push(obj)
+      }
+      const data = {
+        providersId: this.providerObj.id,
+        pickWay: this.tabShow ? 1 : 2,
+        goods: goods,
+        conponId: conponId ? conponId : null,
+      }
+      this.Api.order.orderNow
+        .do(data)
+        .then((res) => {
+          this.updateOrderInfo(res)
+        })
+        .catch((err) => {
+          this.tabShow = !this.tabShow
+        })
+    },
+    //更新页面订单信息
+    updateOrderInfo(data) {
+      //商品列表&规格
+      this.shopObjs = data.goodsListDtoList
+      //自提
+      if (this.tabShow) {
+        if (this.shopList.length == 2) {
+          this.shopList[1].price = data.pickSelfAmount
+        } else {
+          this.shopList.push({
+            name: '自提优惠',
+            price: data.pickSelfAmount,
+            orange: 1,
+            minus: 1,
+          })
+        }
+      }
+      //商品原价&现价
+      this.shopList[0].price = data.goodsOriginAmount
+      this.nowPrice = data.goodsNowAmount
+      this.couponList = data.orderCouponDtos
+    },
+    //选择优惠券
+    toSelectCoupon() {
+      uni.navigateTo({
+        url:
+          '../orderCoupon/orderCoupon?couponList=' +
+          JSON.stringify(this.couponList),
+      })
+    },
+    pay() {
+      const goods = []
+      for (let item of this.shopObjs) {
+        let obj = {
+          goodsId: item.id,
+          num: item.num,
+        }
+        goods.push(obj)
+      }
+      const data = {
+        providersId: this.providerObj.id, //服务商id
+        pickWay: this.tabShow ? '1' : '2', //提货方式 1: 自提 2: 配送
+        goods: goods,
+        conponId: this.selectedCoupon ? this.selectedCoupon.id : '', //优惠券ID
+        selfName: '万锴', //自提人名称
+        selfPhone: '17623563437', //自提人电话
+        expectTime: '2021-07-06 18:26:00', //期望配送时间
+        remark: '备注', //备注
+        payType: 2, //2: 小程序  1: app
+        openId: this.$store.getters['auth/openId'],
+        consignee: 'oliver', //收货人
+        contactNumber: '123456', //联系电话
+        province: '重庆', //省
+        city: '重庆市', //市
+        area: '南岸区', //区
+        detailAddress: '122323', //详细地址
+      }
+      this.Api.order.orderPay.do(data).then((res) => {
+        uni.requestPayment({
+          provider: 'wxpay',
+          timeStamp: res.timeStamp,
+          nonceStr: res.nonceStr,
+          package: res.package,
+          signType: 'MD5',
+          paySign: res.paySign,
+
+          success: (res) => {
+            console.log('success:' + JSON.stringify(res))
+            const shopIds = this.shopObjs.map((item) => {
+              return item.id
+            })
+            uni.redirectTo({
+              url:
+                '../paymentSuccessful/paymentSuccessful?shopIds=' +
+                JSON.stringify(shopIds),
+            })
+          },
+          fail: (err) => {
+            console.log('fail:' + JSON.stringify(err))
+          },
+          complete: (data) => {
+            console.log('complete:' + JSON.stringify(data))
+          },
+        })
+      })
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.marginTop {
+  margin-top: 20rpx;
+}
 .container {
   width: 690rpx;
   margin: 0 auto;
@@ -241,10 +463,99 @@ export default {
           font-size: 30rpx;
           font-weight: bold;
         }
+        .fixed.action,
+        .mobile.action {
+          background: #ffffff;
+          color: #2eb232;
+        }
       }
       .center {
         padding: 20rpx;
         background: #fff;
+        font-size: 30rpx;
+        font-weight: bold;
+        color: #333333;
+        .fixed-content {
+          width: 100%;
+          height: 100%;
+          > .item:not(:first-child) {
+            margin-top: 20rpx;
+          }
+          > .item {
+            width: 100%;
+            height: 110rpx;
+            background: #f5f5f5;
+            border-radius: 20rpx;
+            padding: 0 30rpx;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            > .info {
+              display: flex;
+              align-items: center;
+              text {
+                width: 200rpx;
+                text-align: right;
+              }
+              image {
+                width: 12rpx;
+                height: 20rpx;
+                margin-left: 60rpx;
+              }
+            }
+          }
+        }
+        .mobile-content {
+          > .dis-item {
+            width: 100%;
+            height: 164rpx;
+            background: #f5f5f5;
+            border-radius: 20rpx;
+            padding: 30rpx;
+            > .info {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              .phone {
+                display: flex;
+                align-items: center;
+                image {
+                  width: 12rpx;
+                  height: 20rpx;
+                  margin-left: 60rpx;
+                }
+              }
+            }
+            > .address {
+              margin-top: 20rpx;
+              color: #666666;
+            }
+          }
+          > .item {
+            width: 100%;
+            height: 110rpx;
+            background: #f5f5f5;
+            border-radius: 20rpx;
+            padding: 0 30rpx;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20rpx;
+            > .info {
+              display: flex;
+              align-items: center;
+              text {
+                width: 200rpx;
+                text-align: right;
+              }
+              image {
+                width: 20rpx;
+                height: 20rpx;
+                margin-left: 60rpx;
+              }
+            }
+          }
+        }
       }
     }
   }

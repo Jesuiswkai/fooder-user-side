@@ -13,12 +13,12 @@
           @click="handleSelectCoupon(item)"
         >
           <view class="coupon-price">
-            <view>¥{{ item.amount }}</view>
-            <view>满{{ item.condition }}可用</view>
+            <view>¥{{ item.priceStr }}</view>
+            <view>满{{ item.priceConditionStr }}可用</view>
           </view>
           <view class="coupon-info">
             <view>{{ item.name }}</view>
-            <view>{{ item.time }}</view>
+            <view>有效期{{ item.startTime }}至{{ item.endTime }}</view>
           </view>
           <view
             class="coupon-selector"
@@ -36,6 +36,18 @@
         </view>
       </view>
     </view>
+
+    <view class="opera">
+      <view>
+        <text>可减</text>
+        <text style="color: #ff2424; margin-left: 30rpx"
+          >¥{{ decreasePrice }}</text
+        >
+      </view>
+      <view>
+        <button @click="confirm">确定</button>
+      </view>
+    </view>
   </app-page>
 </template>
 
@@ -44,23 +56,16 @@ export default {
   data() {
     return {
       bgColor: '#f5f5f5',
-      couponList: [
-        {
-          action: 0,
-          amount: '10',
-          condition: '100',
-          name: '商品满减券',
-          time: '有效期2021.06.16至2021.06.30',
-        },
-        {
-          action: 0,
-          amount: '20',
-          condition: '80',
-          name: '商品满减券',
-          time: '有效期2021.06.16至2021.06.30',
-        },
-      ],
+      couponList: [],
+      decreasePrice: '0',
     }
+  },
+  onLoad(data) {
+    let couponList = JSON.parse(data.couponList)
+    for (let item of couponList) {
+      item.action = 0
+    }
+    this.couponList = couponList
   },
   methods: {
     handleSelectCoupon(data) {
@@ -70,6 +75,19 @@ export default {
         }
       }
       data.action = 1
+      this.decreasePrice = data.priceStr
+    },
+    confirm() {
+      const data = this.couponList.filter((item) => {
+        return item.action == 1
+      })
+      if (data.length != 0) {
+        this.$store.commit('other/setCoupon', data[0])
+        uni.navigateBack({
+          //返回
+          delta: 1,
+        })
+      }
     },
   },
 }
@@ -98,6 +116,7 @@ export default {
   }
   .content {
     margin-top: 30rpx;
+    padding-bottom: 200rpx;
     .coupon-list {
       width: 100%;
       height: 190rpx;
@@ -166,6 +185,33 @@ export default {
         background: #ffaeae;
       }
     }
+  }
+}
+.opera {
+  width: 690rpx;
+  height: 100rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  position: fixed;
+  bottom: 60rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20rpx 0 30rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #333333;
+  font-family: 'PingFang SC';
+  button {
+    width: 133rpx;
+    height: 60rpx;
+    background: #2eb232;
+    border-radius: 15rpx;
+    font-size: 24rpx;
+    color: #ffffff;
+    padding: 0;
   }
 }
 </style>

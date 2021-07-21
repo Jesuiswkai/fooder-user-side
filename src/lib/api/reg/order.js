@@ -37,7 +37,7 @@ export default {
   }),
 
   // 订单详情
-  myOrderList: new Api({
+  myOrderDetail: new Api({
     url: '/order/orderDetail',
     method: 'get',
     public: true

@@ -152,18 +152,32 @@ export default {
           dimension: latitude,
         })
         .then((res) => {
-          this.latelyProviders.name = res.name
-          this.latelyProviders.distanceString = res.distanceString
-          this.latelyProviders.image = res.image
+          this.latelyProviders = res
+          this.$store.commit('other/setProvider', res)
         })
     },
     //获取地理位置
     getLocation() {
       uni.getLocation({
+        geocode: true,
         success: (res) => {
+          console.log(res)
           this.longitude = res.longitude
           this.latitude = res.latitude
+
+          // 仅APP支持
+          // let city = res.address.city
+          // city = city.replace('市', '')
+          this.$store.commit('auth/updateCity', '重庆')
+
+          this.$store.commit('auth/updateLocation', {
+            longitude: res.longitude,
+            dimension: res.latitude,
+          })
           this.getLatelyProviders(this.longitude, this.latitude)
+        },
+        fail: (res) => {
+          console.log(res)
         },
       })
     },

@@ -19,7 +19,7 @@
         <view class="my-order">
           <view class="order-title">
             <view class="text">我的订单</view>
-            <view class="link">
+            <view class="link" @click="toMyOrder">
               <text>全部订单</text>
               <image src="@/static/my/right.png" mode="" />
             </view>
@@ -42,6 +42,7 @@
             class="opera-item"
             v-for="(item, index) of operaList"
             :key="index"
+            @click="goto(item)"
           >
             <view class="left">{{ item.leftText }}</view>
             <view class="right">
@@ -72,12 +73,12 @@ export default {
         { url: img5, text: '已取消' },
       ],
       operaList: [
-        { leftText: '优惠券' },
-        { leftText: '常用服务商管理' },
-        { leftText: '提货信息设置' },
-        { leftText: '联系客服', rightText: '023-68690743' },
-        { leftText: '版本更新', rightText: 'V1.0' },
-        { leftText: '关于我们' },
+        { leftText: '优惠券', code: 'coupon' },
+        { leftText: '常用服务商管理', code: 'provider' },
+        { leftText: '提货信息设置', code: 'pickUp' },
+        { leftText: '联系客服', code: 'service', rightText: '023-68690743' },
+        { leftText: '版本更新', code: 'versionUpdate', rightText: 'V1.0' },
+        { leftText: '关于我们', code: 'aboutUs' },
       ],
     }
   },
@@ -88,6 +89,35 @@ export default {
         url: '../login/login',
       })
     }
+  },
+  methods: {
+    toMyOrder() {
+      uni.navigateTo({
+        url: '../myOrder/myOrder',
+      })
+    },
+    goto(data) {
+      switch (data.code) {
+        case 'coupon':
+          uni.navigateTo({
+            url: '../couponList/couponList',
+          })
+          break
+        case 'provider':
+          uni.navigateTo({
+            url: '../serviceProvider/serviceProvider',
+          })
+          break
+        case 'pickUp':
+          break
+        case 'service':
+          break
+        case 'versionUpdate':
+          break
+        case 'aboutUs':
+          break
+      }
+    },
   },
 }
 </script>

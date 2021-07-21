@@ -119,7 +119,7 @@
           <text class="price" v-else style="color: #999">暂无</text>
         </view>
         <view class="btn">
-          <button>立即下单</button>
+          <button @click="orderNow">立即下单</button>
         </view>
       </view>
     </view>
@@ -204,7 +204,9 @@ export default {
     'shopList.data': {
       handler(newValue, oldValue) {
         if (newValue.length == 0) {
-          this.noData = true
+          if (!this.triggered) {
+            this.noData = true
+          }
         } else {
           this.noData = false
           var data = newValue.filter(function (item) {
@@ -295,8 +297,12 @@ export default {
       this.$refs['lazyList'].loadMore()
     },
     refreshData() {
+      if (!this.triggered) {
+        this.triggered = true
+      }
       this.shopList.page = 1
       this.shopList.data = []
+      this.loadData()
     },
     loadData() {
       this.shopList.loading = true
@@ -310,6 +316,7 @@ export default {
       this.Api.product.getUserShopCarList.do(data).then((res) => {
         this.pageLoading = false
         this.shopList.loading = false
+        this.triggered = false
         if (res.list.length != 0) {
           for (let item of res.list) {
             item.action = 0
@@ -320,6 +327,31 @@ export default {
           this.shopList.finished = true
         }
       })
+    },
+    orderNow() {
+      let shopList = this.shopList.data.filter(function (item) {
+        return item.action == 1
+      })
+      if (shopList.length > 0) {
+        let goods = []
+        for (let item of shopList) {
+          let obj = {}
+          obj.goodsId = item.goodId
+          obj.num = item.num
+          goods.push(obj)
+        }
+
+        const data = {
+          providersId: this.$store.getters['other/getProvider'].id,
+          pickWay: 1,
+          goods: goods,
+        }
+        this.Api.order.orderNow.do(data).then((res) => {
+          uni.navigateTo({
+            url: '../order/order?previewData=' + JSON.stringify(res),
+          })
+        })
+      }
     },
   },
 }

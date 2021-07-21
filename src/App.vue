@@ -3,15 +3,13 @@ export default {
   onLaunch: function () {
     console.log('App Launch')
     this.initLayout()
-    // uni.hideTabBar()
+    this.platform()
   },
   onShow: function () {
     console.log('App Show')
-    // uni.hideTabBar()
   },
   onHide: function () {
     console.log('App Hide')
-    // uni.hideTabBar()
   },
   methods: {
     initLayout() {
@@ -31,6 +29,22 @@ export default {
       this.$store.commit('layout/setNavBarHeight', {
         value: navBarHeight,
       })
+    },
+    platform() {
+      // #ifdef APP-PLUS
+      const platform = uni.getSystemInfoSync().platform
+      switch (platform) {
+        case 'android':
+          this.$store.commit('auth/platform', 0)
+          break
+        case 'ios':
+          this.$store.commit('auth/platform', 1)
+          break
+      }
+      // #endif
+      // #ifdef MP-WEIXIN
+      this.$store.commit('auth/platform', 2)
+      // #endif
     },
   },
 }

@@ -4,44 +4,44 @@
       <view
         class="top"
         :class="
-          orderInfo.orderType == 1
+          orderInfo.status == 1
             ? 'waiting'
-            : orderInfo.orderType == 2 || orderInfo.orderType == 3
+            : orderInfo.status == 2 || orderInfo.status == 3
             ? 'transit'
-            : orderInfo.orderType == 4
+            : orderInfo.status == 4
             ? 'complete'
-            : orderInfo.orderType == 5
+            : orderInfo.status == 5
             ? 'cancel'
             : ''
         "
       >
         <view
           class="title"
-          :style="{ 'margin-top': orderInfo.orderType == 4 ? '85rpx' : '' }"
+          :style="{ 'margin-top': orderInfo.status == 4 ? '85rpx' : '' }"
           >{{
-            orderInfo.orderType == 1
+            orderInfo.status == 1
               ? '待付款'
-              : orderInfo.orderType == 2
+              : orderInfo.status == 2
               ? '待配送'
-              : orderInfo.orderType == 3
+              : orderInfo.status == 3
               ? '配送中'
-              : orderInfo.orderType == 4
+              : orderInfo.status == 4
               ? '已完成'
-              : orderInfo.orderType == 5
+              : orderInfo.status == 5
               ? '已取消'
               : ''
           }}</view
         >
         <view class="text">{{
-          orderInfo.orderType == 1
+          orderInfo.status == 1
             ? '未支付，请及时处理'
-            : orderInfo.orderType == 2
+            : orderInfo.status == 2
             ? '商品准备中'
-            : orderInfo.orderType == 3
+            : orderInfo.status == 3
             ? '商品配送中'
-            : orderInfo.orderType == 4
+            : orderInfo.status == 4
             ? ''
-            : orderInfo.orderType == 5
+            : orderInfo.status == 5
             ? '未支付，交易关闭'
             : ''
         }}</view>
@@ -51,29 +51,29 @@
       <view class="transport-type">
         <view class="key">配送方式</view>
         <view class="value">{{
-          orderInfo.type == 1 ? '线上配送' : '门店自提'
+          orderInfo.pickWay == 1 ? '门店自提' : '线上配送'
         }}</view>
       </view>
 
       <!--接收人-->
       <view class="receiveRen">
         <!--线上-->
-        <view class="online" v-if="orderInfo.type == 1">
+        <view class="online" v-if="orderInfo.pickWay == 2">
           <view class="info">
-            <view>陈锐</view>
-            <view>18002334272</view>
+            <view>{{ orderInfo.consignee }}</view>
+            <view>{{ orderInfo.contactNumber }}</view>
           </view>
-          <view class="address">重庆市江北区西普大厦10-1</view>
+          <view class="address">{{ orderInfo.detailAddress }}</view>
         </view>
         <!--线下-->
         <view class="underline" v-else>
-          <view>陈锐</view>
-          <view>18002334272</view>
+          <view>{{ orderInfo.selfName }}</view>
+          <view>{{ orderInfo.selfPhone }}</view>
         </view>
       </view>
 
       <!--提货点-->
-      <view class="pickup-address" v-if="orderInfo.type == 2">
+      <view class="pickup-address" v-if="orderInfo.pickWay == 1">
         <view>提货点：西普6号店</view>
         <view>重庆市九龙坡区隆鑫盛世普天</view>
       </view>
@@ -81,14 +81,14 @@
       <!--时间-->
       <view class="time">
         <!--期望配送时间-->
-        <view class="transport-time" v-if="orderInfo.type == 1">
+        <view class="transport-time" v-if="orderInfo.pickWay == 2">
           <view>期望配送时间</view>
-          <view>2021.06.24</view>
+          <view>{{ orderInfo.expectTime }}</view>
         </view>
         <!--预计自提时间-->
         <view class="self-time" v-else>
           <view>预计自提时间</view>
-          <view>2021.06.24</view>
+          <view>{{ orderInfo.expectTime }}</view>
         </view>
       </view>
 
@@ -96,15 +96,15 @@
       <view class="product-list">
         <view
           class="card"
-          v-for="(item, index) of orderInfo.productList"
+          v-for="(item, index) of orderInfo.goods"
           :key="index"
         >
-          <image src="@/static/index/shop1.png" mode="" />
+          <image :src="item.goodsImg" mode="" />
           <view class="info">
-            <view class="name">{{ item.name }}</view>
+            <view class="name">{{ item.goodsName }}</view>
             <view class="other">
-              <text>¥{{ item.price }}</text>
-              <text>X{{ item.spec }}包</text>
+              <text>¥{{ item.goodsPrice }}</text>
+              <text>X{{ item.goodsNum }}包</text>
             </view>
           </view>
         </view>
@@ -127,7 +127,7 @@
       <!--备注-->
       <view class="remark">
         <view class="title">备注</view>
-        <view class="content"></view>
+        <view class="content">{{ orderInfo.remark }}</view>
       </view>
 
       <!--额外信息-->
@@ -135,7 +135,7 @@
         <!--配送中-线上-->
         <view
           class="transport-online"
-          v-if="orderInfo.type == 1 && orderInfo.orderType == 3"
+          v-if="orderInfo.pickWay == 2 && orderInfo.status == 3"
         >
           <view class="title">配送员</view>
           <view class="personnel">
@@ -146,7 +146,7 @@
         <!--已完成-线上-->
         <view
           class="completed-online"
-          v-if="orderInfo.type == 1 && orderInfo.orderType == 4"
+          v-if="orderInfo.pickWay == 2 && orderInfo.status == 4"
         >
           <view class="title">配送员</view>
           <view class="personnel">
@@ -159,13 +159,13 @@
         <!--已完成-线下-->
         <view
           class="completed-underline"
-          v-if="orderInfo.type == 2 && orderInfo.orderType == 4"
+          v-if="orderInfo.pickWay == 1 && orderInfo.status == 4"
         >
           <view class="title">送达时间</view>
           <view>2021.6.30 14:11:36</view>
         </view>
         <!--已取消-后台-->
-        <view class="canceled-underline" v-if="orderInfo.orderType == 5">
+        <view class="canceled-underline" v-if="orderInfo.status == 5">
           <view class="personnel">
             <view class="name">取消类型</view>
             <view class="phone">平台取消</view>
@@ -184,19 +184,19 @@
 
     <view class="opera">
       <view class="opera-btn">
-        <view class="waiting" v-if="orderInfo.orderType == 1">
+        <view class="waiting" v-if="orderInfo.status == 1">
           <button class="cancelOrder">取消订单</button>
           <button class="toPay">去付款</button>
         </view>
         <view
           class="transport"
-          v-else-if="orderInfo.orderType == 2 || orderInfo.orderType == 3"
+          v-else-if="orderInfo.status == 2 || orderInfo.status == 3"
         >
           <button class="completeReceipt">确认收货</button>
         </view>
         <view
           class="complete"
-          v-else-if="orderInfo.orderType == 4 || orderInfo.orderType == 5"
+          v-else-if="orderInfo.status == 4 || orderInfo.status == 5"
         >
           <button class="buyAgain">再次购买</button>
         </view>
@@ -212,22 +212,64 @@ export default {
     return {
       bgColor: '#f5f5f5',
       orderInfo: {
-        type: 1, //1:线上 2:线下
-        orderType: 1, //1: 待付款 2: 待配送 3: 配送中 4: 已完成 5: 已取消
-        productList: [
-          { url: '', name: '双胞胎种猪配合饲料40kg', price: '140', spec: '1' },
-          { url: '', name: '双胞胎种猪配合饲料40kg', price: '140', spec: '3' },
-          { url: '', name: '双胞胎种猪配合饲料40kg', price: '140', spec: '2' },
-        ],
+        pickWay: 1, //1:自提 2:配送
+        status: '', //1: 待付款 2: 待配送 3: 配送中 4: 已完成 5: 已取消
+        goods: [],
         orderList: [
-          { key: '订单编号', value: '123456789', orange: 0 },
-          { key: '订单时间', value: '2021.6.30 11:43:25', orange: 0 },
-          { key: '商品总额', value: '¥300.00', orange: 0 },
-          { key: '优惠券', value: '- ¥ 10.00', orange: 1 },
-          { key: '实付金额', value: '¥290.00', orange: 0 },
+          { code: 'orderNum', key: '订单编号', value: '123456789', orange: 0 },
+          {
+            code: 'createTime',
+            key: '订单时间',
+            value: '2021.6.30 11:43:25',
+            orange: 0,
+          },
+          { code: 'amount', key: '商品总额', value: '¥300.00', orange: 0 },
+          {
+            code: 'conponAmount',
+            key: '优惠券',
+            value: '- ¥ 10.00',
+            orange: 1,
+          },
+          {
+            code: 'actualAmount',
+            key: '实付金额',
+            value: '¥290.00',
+            orange: 0,
+          },
         ],
+        consignee: '', //收货人姓名
+        contactNumber: '', //收货人电话
+        detailAddress: '', //详细地址
+        selfName: '', //自提人姓名
+        selfPhone: '', //自提人电话
+        remark: '', //备注
+        expectTime: '', //期望配送时间/预计自提时间
       },
     }
+  },
+  onLoad(data) {
+    this.getOrderDetail(data.orderNum)
+  },
+  mounted() {},
+  methods: {
+    getOrderDetail(orderNum) {
+      this.Api.order.myOrderDetail.do({ orderNum: orderNum }).then((res) => {
+        for (let obj in this.orderInfo) {
+          if (obj != 'orderList') {
+            this.orderInfo[obj] = res[obj]
+          }
+        }
+        for (let item of this.orderInfo.orderList) {
+          if (item.code == 'amount' || item.code == 'actualAmount') {
+            item.value = '¥' + res[item.code]
+          } else if (item.code == 'conponAmount') {
+            item.value = '- ¥' + res[item.code]
+          } else {
+            item.value = res[item.code]
+          }
+        }
+      })
+    },
   },
 }
 </script>

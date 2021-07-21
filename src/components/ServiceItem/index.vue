@@ -5,15 +5,15 @@
     @click="clickService"
   >
     <view class="service-img">
-      <image :src="obj.img" mode="" />
+      <image :src="obj.image" mode="" />
     </view>
     <view class="service-info">
       <view class="name">
         <view class="text">{{ obj.name }}</view>
-        <view class="default" v-if="obj.default == 1">默认</view>
+        <view class="default" v-if="obj.isDefault == 1">默认</view>
       </view>
-      <view class="distance">距离{{ obj.distance }}km</view>
-      <view class="address">{{ obj.address }}</view>
+      <view class="distance">距离{{ obj.distanceString }}</view>
+      <view class="address">{{ obj.addressDetail }}</view>
     </view>
     <view v-show="obj.action == 1" class="action">
       <image src="@/static/public/sel_pro.png" mode="" />

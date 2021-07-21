@@ -32,10 +32,11 @@
           <button class="login_btn">登录</button>
           <view class="other">
             <view>其他登录方式</view>
-            <image src="@/static/login/wechart.png" mode="" @click="wxlogin" />
-            <button open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">
-              微信登录
-            </button>
+            <!-- <image src="@/static/login/wechart.png" mode="" @click="wxlogin" /> -->
+            <button
+              open-type="getPhoneNumber"
+              @getphonenumber="getPhoneNumber"
+            ></button>
           </view>
         </view>
       </view>
@@ -86,6 +87,7 @@ export default {
       this.iv = res.detail.iv
       this.wxlogin()
     },
+    // 获取微信登录信息
     getWxLoginParams() {
       uni.login({
         provider: 'weixin',
@@ -106,10 +108,14 @@ export default {
           uni.switchTab({
             url: '../index/index',
           })
-          // uni.navigateTo({
-          //   url: '../testPay/testPay',
-          // })
+          this.getUserInfo()
         })
+    },
+    // 获取用户信息
+    getUserInfo() {
+      this.Api.user.getInfo.do().then((res) => {
+        this.$store.commit('auth/openId', res.user.openId)
+      })
     },
   },
 }
@@ -213,10 +219,17 @@ export default {
           font-weight: 400;
           color: #999999;
         }
-        image {
+        // image {
+        //   margin-top: 80rpx;
+        //   width: 69rpx;
+        //   height: 58rpx;
+        // }
+        button {
           margin-top: 80rpx;
           width: 69rpx;
           height: 58rpx;
+          background: url('@/static/login/wechart.png') no-repeat;
+          background-size: 100% 100%;
         }
       }
     }

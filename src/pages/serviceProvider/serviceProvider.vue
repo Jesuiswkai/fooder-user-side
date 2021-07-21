@@ -4,14 +4,19 @@
       <view class="service-title">
         <view class="text">我的服务商</view>
         <view class="area" @click="openAreaSelect">
-          <u-picker
+          <!-- <u-picker
             mode="selector"
             v-model="areaSelectShow"
             :default-selector="[0]"
             :range="selectorObj"
             range-key="cateName"
-          ></u-picker>
-          <view class="area-text">重庆</view>
+          ></u-picker> -->
+          <u-select
+            v-model="locationObj.show"
+            :list="locationObj.list"
+            @confirm="confirm"
+          ></u-select>
+          <view class="area-text">{{ currentLocation }}</view>
           <image src="@/static/public/right.png" mode="" />
         </view>
       </view>
@@ -28,7 +33,7 @@
 
     <view class="confirm-service">
       <view class="btn-box">
-        <button>确认服务商</button>
+        <button @click="setDefaultProvider">确认服务商</button>
       </view>
     </view>
   </app-page>
@@ -44,36 +49,54 @@ export default {
   data() {
     return {
       bgColor: '#f5f5f5',
-      serviceList: [
-        {
-          action: 0,
-          img: shop1,
-          name: '西普6号',
-          default: 1,
-          distance: '2.80',
-          address:
-            '重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号',
-        },
-        {
-          action: 0,
-          img: shop1,
-          name: '西普4号',
-          default: 0,
-          distance: '1.80',
-          address: '重庆市渝中区上清寺路107号',
-        },
-      ],
-      areaSelectShow: false,
-      selectorObj: [
-        {
-          cateName: '1',
-          id: 1,
-        },
-        {
-          cateName: '2',
-          id: 2,
-        },
-      ],
+      serviceList: [],
+      currentLocation: '',
+      locationObj: {
+        show: false,
+        list: [
+          { label: '北京' },
+          { label: '天津' },
+          { label: '河北省' },
+          { label: '山西省' },
+          { label: '内蒙古自治区' },
+          { label: '辽宁省' },
+          { label: '吉林省' },
+          { label: '黑龙江省' },
+          { label: '上海' },
+          { label: '江苏省' },
+          { label: '浙江省' },
+          { label: '安徽省' },
+          { label: '福建省' },
+          { label: '江西省' },
+          { label: '山东省' },
+          { label: '河南省' },
+          { label: '湖北省' },
+          { label: '湖南省' },
+          { label: '广东省' },
+          { label: '广西壮族自治区' },
+          { label: '海南省' },
+          { label: '重庆' },
+          { label: '四川省' },
+          { label: '贵州省' },
+          { label: '云南省' },
+          { label: '西藏自治区' },
+          { label: '陕西省' },
+          { label: '甘肃省' },
+          { label: '青海省' },
+          { label: '宁夏回族自治区' },
+          { label: '新疆维吾尔自治区' },
+          { label: '台湾省' },
+          { label: '香港特别行政区' },
+          { label: '澳门特别行政区' },
+        ],
+      },
+    }
+  },
+  onLoad() {
+    const city = this.$store.getters['auth/getCity']
+    if (city) {
+      this.currentLocation = city
+      this.getProviders(city)
     }
   },
   methods: {
@@ -86,7 +109,53 @@ export default {
       row.action = 1
     },
     openAreaSelect() {
-      this.areaSelectShow = true
+      this.locationObj.show = true
+    },
+    // 选择省级城市
+    confirm(params) {
+      this.currentLocation = params[0].label
+      this.getProviders(params[0].label)
+    },
+    // 获取服务商列表
+    getProviders(city) {
+      const location = this.$store.getters['auth/getLocation']
+      const data = {
+        province: city,
+        longitude: location.longitude,
+        dimension: location.dimension,
+      }
+      this.Api.provide.providersList.do(data).then((res) => {
+        for (let item of res.list) {
+          item.action = 0
+        }
+        this.serviceList = res.list
+      })
+    },
+    // 设置默认服务商
+    setDefaultProvider() {
+      console.log(this.serviceList)
+      let arr = this.serviceList.filter((item) => {
+        return item.action == 1
+      })
+      if (arr.length > 0) {
+        const data = {
+          providersId: arr[0].id,
+        }
+        this.Api.provide.setDefaultProviders.do(data).then((res) => {
+          this.getProviders(this.$store.getters['auth/getCity'])
+          uni.showToast({
+            title: '设置默认服务商成功',
+            icon: 'none',
+            duration: 2000,
+          })
+        })
+      } else {
+        uni.showToast({
+          title: '请选择服务商',
+          icon: 'none',
+          duration: 2000,
+        })
+      }
     },
   },
 }

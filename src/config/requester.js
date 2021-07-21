@@ -12,7 +12,7 @@ export async function request({
     Authorization: store.getters['auth/token'],
     // Authorization:
     //   'l7adGWhnVU6yZqKYRlDsbNy6weAjBmOtdSE8iwHR6LG7+JBDw0lbpJYm2KhnXblD',
-    app: 2
+    app: store.getters['auth/platform']
   }
 
   if (!pb) {
@@ -34,20 +34,28 @@ export async function request({
     } else {
       rst = res
       if (rst.statusCode !== 200) {
-        if (rst.statusCode === 401) {
-          store.commit('auth/logout')
-          uni.showToast({
-            title: rst.data.msg,
-            icon: 'none',
-            duration: 2000
-          })
-        }
+        // if (rst.statusCode === 401) {
+        //   store.commit('auth/logout')
+        //   uni.showToast({
+        //     title: rst.data.msg,
+        //     icon: 'none',
+        //     duration: 2000
+        //   })
+        // }
 
         throw rst
       } else {
         rst = rst.data
         // 自定义状态码
         if (rst.code !== 0) {
+          if (rst.code === 401) {
+            store.commit('auth/logout')
+          }
+          uni.showToast({
+            title: rst.msg,
+            icon: 'none',
+            duration: 2000
+          })
           throw rst
         }
       }

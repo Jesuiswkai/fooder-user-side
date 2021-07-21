@@ -1,14 +1,14 @@
 <template>
   <view class="shop-order">
     <view class="shop-img">
-      <image :src="obj.url" mode="" />
+      <image :src="obj.img" mode="" />
     </view>
 
     <view class="shop-info">
       <view class="name">{{ obj.name }}</view>
       <view class="more">
-        <view class="price">{{ obj.price }}</view>
-        <view class="specs">{{ obj.specs }}</view>
+        <view class="price">¥{{ obj.money }}</view>
+        <view class="specs">X{{ obj.num }}包</view>
       </view>
     </view>
   </view>

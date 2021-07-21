@@ -22,6 +22,11 @@ export default {
       bgColor: '#f5f5f5',
     }
   },
+  onLoad(data) {
+    this.Api.product.deleteUserShopCar
+      .do(JSON.parse(data.shopIds))
+      .then((res) => {})
+  },
   methods: {
     toOrderDetail() {
       uni.navigateTo({ url: '../orderDetail/orderDetail' })

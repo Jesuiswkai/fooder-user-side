@@ -1,15 +1,15 @@
 {
   "pages": [
     {
-      "path": "pages/order/order",
+      "path": "pages/pickUpInfo/pickUpInfo",
       "style": {
-        "navigationBarTitleText": "确认下单"
+        "navigationBarTitleText": "提货信息"
       }
     },
     {
-      "path": "pages/personalData/personalData",
+      "path": "pages/pickUpInfoUpdate/pickUpInfoUpdate",
       "style": {
-        "navigationBarTitleText": "个人资料"
+        "navigationBarTitleText": "编辑提货信息"
       }
     },
     {
@@ -19,21 +19,15 @@
       }
     },
     {
-      "path": "pages/serviceProvider/serviceProvider",
-      "style": {
-        "navigationBarTitleText": "选择服务商"
-      }
-    },
-    {
-      "path": "pages/shoppingCart/shoppingCart",
-      "style": {
-        "navigationBarTitleText": "购物车"
-      }
-    },
-    {
       "path": "pages/login/login",
       "style": {
         "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/serviceProvider/serviceProvider",
+      "style": {
+        "navigationBarTitleText": "选择服务商"
       }
     },
     {
@@ -43,9 +37,15 @@
       }
     },
     {
-      "path": "pages/search/search",
+      "path": "pages/orderCoupon/orderCoupon",
       "style": {
-        "navigationBarTitleText": "搜索"
+        "navigationBarTitleText": "选择优惠券"
+      }
+    },
+    {
+      "path": "pages/order/order",
+      "style": {
+        "navigationBarTitleText": "确认下单"
       }
     },
     {
@@ -55,15 +55,45 @@
       }
     },
     {
-      "path": "pages/testPay/testPay",
-      "style": {
-        "navigationBarTitleText": "支付测试"
-      }
-    },
-    {
       "path": "pages/my/my",
       "style": {
         "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages/couponList/couponList",
+      "style": {
+        "navigationBarTitleText": "优惠券"
+      }
+    },
+    {
+      "path": "pages/couponDraw/couponDraw",
+      "style": {
+        "navigationBarTitleText": "领取优惠券"
+      }
+    },
+    {
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
+      "path": "pages/personalData/personalData",
+      "style": {
+        "navigationBarTitleText": "个人资料"
+      }
+    },
+    {
+      "path": "pages/shoppingCart/shoppingCart",
+      "style": {
+        "navigationBarTitleText": "购物车"
+      }
+    },
+    {
+      "path": "pages/testPay/testPay",
+      "style": {
+        "navigationBarTitleText": "支付测试"
       }
     },
     {
@@ -94,24 +124,6 @@
       "path": "pages/messageNotification/messageNotification",
       "style": {
         "navigationBarTitleText": "消息通知"
-      }
-    },
-    {
-      "path": "pages/orderCoupon/orderCoupon",
-      "style": {
-        "navigationBarTitleText": "选择优惠券"
-      }
-    },
-    {
-      "path": "pages/pickUpInfo/pickUpInfo",
-      "style": {
-        "navigationBarTitleText": "提货信息"
-      }
-    },
-    {
-      "path": "pages/pickUpInfoUpdate/pickUpInfoUpdate",
-      "style": {
-        "navigationBarTitleText": "编辑提货信息"
       }
     },
     {

@@ -120,25 +120,25 @@ export default {
         .then((res) => {
           console.log(res)
           console.log('起调支付')
-          orderInfo: res.data,
-            uni.requestPayment({
-              provider: 'wxpay',
-              timeStamp: res.timeStamp,
-              nonceStr: res.nonceStr,
-              package: res.package,
-              signType: 'MD5',
-              paySign: res.paySign,
+          // orderInfo: res.data,
+          uni.requestPayment({
+            provider: 'wxpay',
+            timeStamp: res.timeStamp,
+            nonceStr: res.nonceStr,
+            package: res.package,
+            signType: 'MD5',
+            paySign: res.paySign,
 
-              success: function (res) {
-                console.log('success:' + JSON.stringify(res))
-              },
-              fail: function (err) {
-                console.log('fail:' + JSON.stringify(err))
-              },
-              complete: function (data) {
-                console.log('complete:' + JSON.stringify(data))
-              },
-            })
+            success: function (res) {
+              console.log('success:' + JSON.stringify(res))
+            },
+            fail: function (err) {
+              console.log('fail:' + JSON.stringify(err))
+            },
+            complete: function (data) {
+              console.log('complete:' + JSON.stringify(data))
+            },
+          })
 
           // const orderInfo = {
           //   appid: res.appid,
