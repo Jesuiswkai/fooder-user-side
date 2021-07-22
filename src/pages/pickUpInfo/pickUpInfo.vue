@@ -1,35 +1,74 @@
 <template>
   <app-page title="提货信息" :bgColor="bgColor" showNavbar>
     <view class="container">
-      <view class="card" v-for="(item, index) of cardList">
-        <view class="info">
-          <view class="personal">
-            <view class="name">{{ item.name }}</view>
-            <view class="phone-and-img">
-              <view class="phone">{{ item.phone }}</view>
-              <image src="@/static/public/right.png" mode="" />
+      <scroll-view
+        v-show="isShow"
+        style="width: 100%; height: 74vh"
+        scroll-y
+        @scrolltolower="scrollToLower()"
+        :refresher-enabled="isLogin"
+        @refresherrefresh="refreshData()"
+        :refresher-triggered="triggered"
+      >
+        <lazy-list
+          v-model="cardList.loading"
+          :list="cardList.data"
+          :finished="cardList.finished"
+          @load="loadData"
+          proxy
+          ref="lazyList"
+          hideLoadmore
+        >
+          <view class="cards">
+            <view class="card" v-for="(item, index) of cardList.data">
+              <view class="info" @click="updateAddress(item)">
+                <view class="personal">
+                  <view class="name">{{ item.userName }}</view>
+                  <view class="phone-and-img">
+                    <view class="phone">{{ item.phone }}</view>
+                    <image src="@/static/public/right.png" mode="" />
+                  </view>
+                </view>
+                <view class="address">{{ item.detail }}</view>
+              </view>
+              <view class="card-opera">
+                <view
+                  class="default-address"
+                  :class="item.isDefault ? 'action' : ''"
+                >
+                  <text>默认地址</text>
+                  <u-switch
+                    v-model="item.isDefault"
+                    size="30"
+                    active-color="#fff"
+                    @change="change(item)"
+                  ></u-switch>
+                </view>
+                <view class="remove" @click="removeAddress(item, index)"
+                  >删除</view
+                >
+              </view>
             </view>
           </view>
-          <view class="address">{{ item.address }}</view>
-        </view>
-        <view class="card-opera">
-          <view class="default-address" :class="item.default ? 'action' : ''">
-            <text>默认地址</text>
-            <u-switch
-              v-model="item.default"
-              size="30"
-              active-color="#fff"
-              @change="change(item)"
-            ></u-switch>
-          </view>
-          <view class="remove">删除</view>
-        </view>
+        </lazy-list>
+      </scroll-view>
+
+      <view v-show="!isShow" class="no-data">
+        <image src="@/static/public/placeholder.png" mode="" />
+        <text>暂无数据</text>
       </view>
     </view>
 
     <view class="opera">
-      <button>添加收货地址</button>
+      <button @click="receiptAddress">添加收货地址</button>
     </view>
+    <u-modal
+      v-model="removeModal"
+      content="确定要删除改地址吗"
+      :show-title="false"
+      @confirm="removeConfirm"
+      show-cancel-button
+    ></u-modal>
   </app-page>
 </template>
 
@@ -37,42 +76,111 @@
 export default {
   data() {
     return {
+      isLogin: true,
+      triggered: false,
       bgColor: '#f5f5f5',
-      cardList: [
-        {
-          code: '1',
-          name: '陈锐',
-          phone: '18002334272',
-          address: '重庆市江北区西普大厦10-1',
-          default: true,
-        },
-        {
-          code: '2',
-          name: '万锴',
-          phone: '17623563437',
-          address: '重庆市江北区西普大厦10-1-1',
-          default: false,
-        },
-        {
-          code: '3',
-          name: '青青',
-          phone: '17623563437',
-          address: '重庆市江北区西普大厦10-1-2',
-          default: false,
-        },
-      ],
+      cardList: {
+        loading: false,
+        finished: false,
+        page: 1,
+        pageSize: 10,
+        data: [],
+      },
+      isShow: true,
+      removeModal: false,
+      temporarilyData: null,
     }
   },
+  onShow() {
+    this.cardList.data = []
+    this.loadData()
+  },
   methods: {
+    // 设置默认地址
     change(data) {
-      console.log(1)
-      if (data.default) {
-        for (let item of this.cardList) {
-          if (item.code != data.code) {
-            item.default = false
+      if (data.isDefault) {
+        data.isDefault = 1
+        this.Api.user.updateUserAddress.do(data).then((res) => {
+          for (let item of this.cardList.data) {
+            if (item.id != data.id) {
+              item.isDefault = false
+            }
           }
-        }
+        })
       }
+    },
+    // 添加地址
+    receiptAddress() {
+      uni.navigateTo({
+        url: '../pickUpInfoUpdate/pickUpInfoUpdate',
+      })
+    },
+    // 修改地址
+    updateAddress(item) {
+      uni.navigateTo({
+        url: '../pickUpInfoUpdate/pickUpInfoUpdate?id=' + item.id,
+      })
+    },
+    // 删除地址
+    removeAddress(item, index) {
+      this.removeModal = true
+      this.temporarilyData = {
+        item: item,
+        index: index,
+      }
+    },
+    removeConfirm() {
+      this.Api.user.deleteUserAddress
+        .do([this.temporarilyData.item.id])
+        .then((res) => {
+          uni.showToast({
+            title: '删除成功',
+            icon: 'none',
+            duration: 2000,
+          })
+          this.cardList.data.splice(this.temporarilyData.index, 1)
+        })
+    },
+    scrollToLower() {
+      this.cardList.page += 1
+      this.$refs['lazyList'].loadMore()
+    },
+    refreshData() {
+      if (!this.triggered) {
+        this.triggered = true
+      }
+      this.cardList.page = 1
+      this.cardList.data = []
+      this.cardList.finished = false
+      this.loadData()
+    },
+    loadData() {
+      this.cardList.loading = true
+      const data = {
+        page: this.cardList.page,
+        pageSize: this.cardList.pageSize,
+        type: this.cardList.type,
+      }
+      if (this.cardList.finished) {
+        return
+      }
+      this.Api.user.getUserAddressList.do(data).then((res) => {
+        this.cardList.loading = false
+        this.triggered = false
+        if (res.list.length != 0) {
+          for (let item of res.list) {
+            if (this.cardList.type != 1) {
+              item.lose = 1
+            }
+            this.cardList.data.push(item)
+          }
+        } else {
+          if (data.page == 1) {
+            this.isShow = false
+          }
+          this.cardList.finished = true
+        }
+      })
     },
   },
 }
@@ -99,67 +207,86 @@ export default {
   .card:not(:last-child) {
     margin-bottom: 30rpx;
   }
-  .card {
-    width: 690rpx;
-    height: 276rpx;
-    background: #fff;
-    border-radius: 20rpx;
-    .info {
-      height: 164rpx;
-      border-bottom: 2rpx solid #f5f5f5;
-      padding: 30rpx;
-      font-size: 30rpx;
-      font-weight: bold;
-      color: #333333;
-      .personal {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        .phone-and-img {
+  .cards {
+    padding-bottom: 20rpx;
+    .card {
+      width: 690rpx;
+      height: 276rpx;
+      background: #fff;
+      border-radius: 20rpx;
+      .info {
+        height: 164rpx;
+        border-bottom: 2rpx solid #f5f5f5;
+        padding: 30rpx;
+        font-size: 30rpx;
+        font-weight: bold;
+        color: #333333;
+        .personal {
           display: flex;
+          justify-content: space-between;
           align-items: center;
-          image {
-            margin-left: 60rpx;
-            width: 12rpx;
-            height: 20rpx;
+          .phone-and-img {
+            display: flex;
+            align-items: center;
+            image {
+              margin-left: 60rpx;
+              width: 12rpx;
+              height: 20rpx;
+            }
           }
         }
+        .address {
+          margin-top: 20rpx;
+          color: #666666;
+        }
       }
-      .address {
-        margin-top: 20rpx;
-        color: #666666;
-      }
-    }
-    .card-opera {
-      height: 110rpx;
-      padding: 30rpx;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 24rpx;
-      font-weight: bold;
-      color: #ffffff;
-      .default-address.action {
-        background: #9dd98d;
-      }
-      .default-address {
-        width: 202rpx;
-        height: 50rpx;
-        background: #cccccc;
-        border-radius: 25rpx;
-        padding: 0rpx 12rpx;
+      .card-opera {
+        height: 110rpx;
+        padding: 30rpx;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        font-size: 24rpx;
+        font-weight: bold;
+        color: #ffffff;
+        .default-address.action {
+          background: #9dd98d;
+        }
+        .default-address {
+          width: 202rpx;
+          height: 50rpx;
+          background: #cccccc;
+          border-radius: 25rpx;
+          padding: 0rpx 12rpx;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .remove {
+          width: 120rpx;
+          height: 50rpx;
+          line-height: 50rpx;
+          background: #ffaeae;
+          border-radius: 25rpx;
+          text-align: center;
+        }
       }
-      .remove {
-        width: 120rpx;
-        height: 50rpx;
-        line-height: 50rpx;
-        background: #ffaeae;
-        border-radius: 25rpx;
-        text-align: center;
-      }
+    }
+  }
+  .no-data {
+    margin-top: 140rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    image {
+      width: 300rpx;
+      height: 300rpx;
+    }
+    text {
+      margin-top: 50rpx;
+      font-size: 24rpx;
+      font-weight: 400;
+      color: #999999;
     }
   }
 }

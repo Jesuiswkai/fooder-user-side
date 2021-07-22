@@ -93,7 +93,7 @@ export default {
       }
       this.Api.order.orderNow.do(data).then((res) => {
         uni.navigateTo({
-          url: '../order/order?previewData=' + res,
+          url: '../order/order?previewData=' + JSON.stringify(res),
         })
       })
     },

@@ -74,8 +74,8 @@
 
       <!--提货点-->
       <view class="pickup-address" v-if="orderInfo.pickWay == 1">
-        <view>提货点：西普6号店</view>
-        <view>重庆市九龙坡区隆鑫盛世普天</view>
+        <view>提货点：{{ orderInfo.providersDto.name }}</view>
+        <view>{{ orderInfo.providersDto.addressDetail }}</view>
       </view>
 
       <!--时间-->
@@ -154,7 +154,7 @@
             <view class="phone">18002334272</view>
           </view>
           <view class="title">送达时间</view>
-          <view>2021.6.30 14:11:36</view>
+          <view>{{ orderInfo.completeTime }}</view>
         </view>
         <!--已完成-线下-->
         <view
@@ -162,21 +162,23 @@
           v-if="orderInfo.pickWay == 1 && orderInfo.status == 4"
         >
           <view class="title">送达时间</view>
-          <view>2021.6.30 14:11:36</view>
+          <view>{{ orderInfo.completeTime }}</view>
         </view>
         <!--已取消-后台-->
         <view class="canceled-underline" v-if="orderInfo.status == 5">
           <view class="personnel">
             <view class="name">取消类型</view>
-            <view class="phone">平台取消</view>
+            <view class="phone">{{
+              orderInfo.cancelType == 1 ? '用户取消' : '平台取消'
+            }}</view>
           </view>
           <view class="personnel" style="margin-top: 20rpx">
             <view class="name">取消时间</view>
-            <view class="phone">2021.6.30 11:43:25</view>
+            <view class="phone">{{ orderInfo.cancelTime }}</view>
           </view>
           <view class="personnel" style="margin-top: 20rpx">
             <view class="name">退款金额</view>
-            <view class="phone">¥150.00</view>
+            <view class="phone">¥{{ orderInfo.cancelAmount }}</view>
           </view>
         </view>
       </view>
@@ -216,24 +218,24 @@ export default {
         status: '', //1: 待付款 2: 待配送 3: 配送中 4: 已完成 5: 已取消
         goods: [],
         orderList: [
-          { code: 'orderNum', key: '订单编号', value: '123456789', orange: 0 },
+          { code: 'orderNum', key: '订单编号', value: '', orange: 0 },
           {
             code: 'createTime',
             key: '订单时间',
-            value: '2021.6.30 11:43:25',
+            value: '',
             orange: 0,
           },
-          { code: 'amount', key: '商品总额', value: '¥300.00', orange: 0 },
+          { code: 'amount', key: '商品总额', value: '', orange: 0 },
           {
             code: 'conponAmount',
             key: '优惠券',
-            value: '- ¥ 10.00',
+            value: '',
             orange: 1,
           },
           {
             code: 'actualAmount',
             key: '实付金额',
-            value: '¥290.00',
+            value: '',
             orange: 0,
           },
         ],
@@ -244,6 +246,17 @@ export default {
         selfPhone: '', //自提人电话
         remark: '', //备注
         expectTime: '', //期望配送时间/预计自提时间
+        completeTime: '', //自提/配送完成时间
+        payTime: '', //支付时间
+        cancelType: '', //取消类型 1:用户  2:平台
+        cancelTime: '', //取消时间
+        cancelAmount: '', //取消金额
+        list: {}, //配送员信息
+        providersDto: {
+          //服务商信息
+          name: '',
+          addressDetail: '',
+        },
       },
     }
   },

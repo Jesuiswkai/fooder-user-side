@@ -1,6 +1,12 @@
 {
   "pages": [
     {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
       "path": "pages/pickUpInfo/pickUpInfo",
       "style": {
         "navigationBarTitleText": "提货信息"
@@ -10,12 +16,6 @@
       "path": "pages/pickUpInfoUpdate/pickUpInfoUpdate",
       "style": {
         "navigationBarTitleText": "编辑提货信息"
-      }
-    },
-    {
-      "path": "pages/index/index",
-      "style": {
-        "navigationBarTitleText": "首页"
       }
     },
     {
