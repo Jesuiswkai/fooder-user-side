@@ -2,7 +2,11 @@
   <app-page title="搜索" showNavbar :bgColor="bgColor">
     <view class="container">
       <view class="search-input">
-        <image class="search-img" src="@/static/public/search.png" mode="" />
+        <image
+          class="search-img"
+          src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/search.png"
+          mode=""
+        />
         <input
           v-model="shopList.name"
           :focus="searchFocus"
@@ -14,7 +18,7 @@
           <image
             v-show="clearBtnShow"
             class="search-clear"
-            src="@/static/public/clear.png"
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/clear.png"
             mode=""
             @click="clearSearch"
             @confirm="resetSearch"
@@ -39,7 +43,7 @@
               <view class="his-title">
                 <view class="text">搜索历史</view>
                 <image
-                  src="@/static/public/trash.png"
+                  src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/trash.png"
                   mode=""
                   @click="emptyHis"
                 />
@@ -71,7 +75,10 @@
                     @click="hotAndHisSearch(item.text)"
                   >
                     <view class="text">{{ item.text }}</view>
-                    <image src="@/static/public/right.png" mode="" />
+                    <image
+                      src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+                      mode=""
+                    />
                   </view>
                 </view>
               </view>

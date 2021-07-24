@@ -97,7 +97,10 @@
       </scroll-view>
 
       <view v-else class="no-data">
-        <image src="@/static/shop/no_data.png" mode="" />
+        <image
+          src="https://slmall.oss-cn-beijing.aliyuncs.com/web/shop/no_data.png"
+          mode=""
+        />
       </view>
     </view>
 

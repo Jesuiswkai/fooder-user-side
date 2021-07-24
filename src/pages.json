@@ -7,6 +7,12 @@
       }
     },
     {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
       "path": "pages/order/order",
       "style": {
         "navigationBarTitleText": "确认下单"
@@ -22,12 +28,6 @@
       "path": "pages/pickUpInfoUpdate/pickUpInfoUpdate",
       "style": {
         "navigationBarTitleText": "编辑提货信息"
-      }
-    },
-    {
-      "path": "pages/login/login",
-      "style": {
-        "navigationBarTitleText": "登录"
       }
     },
     {

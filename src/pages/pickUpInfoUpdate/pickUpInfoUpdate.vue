@@ -12,7 +12,7 @@
           <image
             v-show="form.userName != ''"
             @click="emptyInput('userName')"
-            src="@/static/public/personal_clear.png"
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/personal_clear.png"
             mode=""
           />
         </view>
@@ -24,7 +24,7 @@
           <input v-model="form.phone" type="digit" placeholder="请输入手机号" />
           <image
             v-show="form.phone != ''"
-            src="@/static/public/personal_clear.png"
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/personal_clear.png"
             mode=""
             @click="emptyInput('phone')"
           />
@@ -35,7 +35,10 @@
         <view class="label">所在地区</view>
         <view class="value">
           <input type="text" disabled :placeholder="regionText" />
-          <image src="@/static/public/personal_goto.png" mode="" />
+          <image
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/personal_goto.png"
+            mode=""
+          />
         </view>
       </view>
 
@@ -49,7 +52,7 @@
           />
           <image
             v-show="form.detail != ''"
-            src="@/static/public/personal_clear.png"
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/personal_clear.png"
             mode=""
             @click="emptyInput('detail')"
           />

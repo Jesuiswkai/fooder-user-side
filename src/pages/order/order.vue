@@ -43,7 +43,10 @@
                   <text>{{ deliveryMethod.phone }}</text>
                   <view @click="selectPickUp">
                     <text v-show="deliveryMethod.status == 0">请选择</text>
-                    <image src="@/static/public/right.png" mode="" />
+                    <image
+                      src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+                      mode=""
+                    />
                   </view>
                 </view>
               </view>
@@ -52,7 +55,7 @@
                 <view class="info" @click="openPicker">
                   <text>{{ deliveryMethod.expectTime }}</text>
                   <image
-                    src="@/static/public/date_time.png"
+                    src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/date_time.png"
                     mode=""
                     style="width: 20rpx; height: 20rpx"
                   />
@@ -68,7 +71,10 @@
                     <text>{{ deliveryMethod.phone }}</text>
                     <view @click="selectPickUp">
                       <text v-show="deliveryMethod.status == 0">请选择</text>
-                      <image src="@/static/public/right.png" mode="" />
+                      <image
+                        src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+                        mode=""
+                      />
                     </view>
                   </view>
                 </view>
@@ -78,7 +84,10 @@
                 <view>期望配送时间</view>
                 <view class="info" @click="openPicker">
                   <text>{{ deliveryMethod.expectTime }}</text>
-                  <image src="@/static/public/date_time.png" mode="" />
+                  <image
+                    src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/date_time.png"
+                    mode=""
+                  />
                 </view>
               </view>
             </view>
@@ -117,7 +126,10 @@
                   style="font-size: 24rpx; font-weight: 400; color: #999999"
                   >请选择优惠券</view
                 >
-                <image src="@/static/public/right.png" mode="" />
+                <image
+                  src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+                  mode=""
+                />
               </view>
             </view>
             <view class="remark">
@@ -178,7 +190,10 @@
                 <view class="info">
                   <view class="phone">{{ item.phone }}</view>
                   <view class="img" @click.stop="toPickUp">
-                    <image src="@/static/public/right.png" mode="" />
+                    <image
+                      src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+                      mode=""
+                    />
                   </view>
                 </view>
               </view>

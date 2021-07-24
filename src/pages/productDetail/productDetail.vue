@@ -23,7 +23,10 @@
     <view class="shop-opera">
       <view class="opera-btn">
         <view class="car-img">
-          <image src="@/static/shop/car.png" mode="" />
+          <image
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/shop/car.png"
+            mode=""
+          />
           <u-badge
             type="error"
             :count="shopCarCount"

@@ -35,39 +35,35 @@
 
 
 <script>
-import home from '@/static/tabBar/home.png'
-import homeAction from '@/static/tabBar/home_action.png'
-import classify from '@/static/tabBar/classify.png'
-import classifyAction from '@/static/tabBar/classify_action.png'
-import shopingCar from '@/static/tabBar/shoping_car.png'
-import shopingCarAction from '@/static/tabBar/shoping_car_action.png'
-import my from '@/static/tabBar/my.png'
-import myAction from '@/static/tabBar/my_action.png'
 export default {
   data() {
     return {
       tabList: [
         {
-          icon: home,
-          iconAction: homeAction,
+          icon: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/home.png',
+          iconAction:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/home_action.png',
           text: '首页',
           path: '../../pages/index/index',
         },
         {
-          icon: classify,
-          iconAction: classifyAction,
+          icon: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/classify.png',
+          iconAction:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/classify_action.png',
           text: '分类',
           path: '../../pages/classification/classification',
         },
         {
-          icon: shopingCar,
-          iconAction: shopingCarAction,
+          icon: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/shoping_car.png',
+          iconAction:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/shoping_car_action.png',
           text: '购物车',
           path: '../../pages/shoppingCart/shoppingCart',
         },
         {
-          icon: my,
-          iconAction: myAction,
+          icon: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/my.png',
+          iconAction:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/tabBar/my_action.png',
           text: '我的',
         },
       ],

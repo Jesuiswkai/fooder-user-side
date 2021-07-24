@@ -23,7 +23,7 @@
             <view class="name">
               <view>{{ latelyProviders.name }}</view>
               <image
-                src="@/static/index/right.png"
+                src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
                 mode=""
                 style="width: 10rpx; height: 18rpx"
               />
@@ -32,11 +32,17 @@
           </view>
         </view>
         <view class="search-input" @click="toSearch">
-          <image src="@/static/public/search.png" mode="" />
+          <image
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/search.png"
+            mode=""
+          />
           <input type="text" placeholder="输入关键词搜索" disabled />
         </view>
         <view class="scan-qr" @click="scanCode">
-          <image src="@/static/index/qrcode.png" mode="" />
+          <image
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/index/qrcode.png"
+            mode=""
+          />
         </view>
       </view>
 
@@ -49,7 +55,10 @@
           <image :src="item.image" mode="" />
           <view class="shop-type-name">
             <view class="type-name">{{ item.name }}</view>
-            <image src="@/static/index/typeName.png" mode="" />
+            <image
+              src="https://slmall.oss-cn-beijing.aliyuncs.com/web/index/typeName.png"
+              mode=""
+            />
           </view>
         </view>
       </view>
@@ -77,13 +86,6 @@
 </template>
 
 <script>
-import shopType1 from '@/static/index/shopType1.png'
-import shopType2 from '@/static/index/shopType2.png'
-import shopType3 from '@/static/index/shopType3.png'
-import shopType4 from '@/static/index/shopType4.png'
-import shopType5 from '@/static/index/shopType5.png'
-import shop1 from '@/static/index/shop1.png'
-import shop2 from '@/static/index/shop2.png'
 export default {
   data() {
     return {
@@ -91,16 +93,33 @@ export default {
       latitude: null, //纬度
       list: [],
       shopTypeList: [
-        { image: shopType1, name: '猪料' },
-        { image: shopType2, name: '鱼料' },
-        { image: shopType3, name: '动保' },
-        { image: shopType4, name: '消耗品' },
-        { image: shopType5, name: '设备' },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/index/shopType1.png',
+          name: '猪料',
+        },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/index/shopType2.png',
+          name: '鱼料',
+        },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/index/shopType3.png',
+          name: '动保',
+        },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/index/shopType4.png',
+          name: '消耗品',
+        },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/index/shopType5.png',
+          name: '设备',
+        },
       ],
-      shopList: [
-        { img: shop1, name: '双胞胎种猪配合饲料40kg', money: '¥150' },
-        { img: shop2, name: '双胞胎种猪配合饲料40kg', money: '¥150' },
-      ],
+      shopList: [],
       latelyProviders: {
         name: '',
         image: null,

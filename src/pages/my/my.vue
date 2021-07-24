@@ -6,13 +6,19 @@
         <view class="avatar-info">
           <view class="avatar"></view>
           <view class="info">
-            <image src="@/static/public/message.png" mode="" />
+            <image
+              src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/message.png"
+              mode=""
+            />
           </view>
         </view>
         <view class="phone">
           <view class="big">
             <text>166*****0612</text>
-            <image src="@/static/public/right.png" mode="" />
+            <image
+              src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+              mode=""
+            />
           </view>
           <view class="small">16623100612</view>
         </view>
@@ -21,7 +27,10 @@
             <view class="text">我的订单</view>
             <view class="link" @click="toMyOrder">
               <text>全部订单</text>
-              <image src="@/static/my/right.png" mode="" />
+              <image
+                src="https://slmall.oss-cn-beijing.aliyuncs.com/web/my/right.png"
+                mode=""
+              />
             </view>
           </view>
           <view class="order-list">
@@ -47,7 +56,11 @@
             <view class="left">{{ item.leftText }}</view>
             <view class="right">
               <view v-if="item.rightText">{{ item.rightText }}</view>
-              <image v-else src="@/static/public/right.png" mode="" />
+              <image
+                v-else
+                src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+                mode=""
+              />
             </view>
           </view>
         </view>
@@ -57,20 +70,30 @@
 </template>
 
 <script>
-import img1 from '@/static/my/1.png'
-import img2 from '@/static/my/2.png'
-import img3 from '@/static/my/3.png'
-import img4 from '@/static/my/4.png'
-import img5 from '@/static/my/5.png'
 export default {
   data() {
     return {
       orderList: [
-        { url: img1, text: '待支付' },
-        { url: img2, text: '待配送' },
-        { url: img3, text: '配送中' },
-        { url: img4, text: '已完成' },
-        { url: img5, text: '已取消' },
+        {
+          url: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/my/1.png',
+          text: '待支付',
+        },
+        {
+          url: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/my/2.png',
+          text: '待配送',
+        },
+        {
+          url: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/my/3.png',
+          text: '配送中',
+        },
+        {
+          url: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/my/4.png',
+          text: '已完成',
+        },
+        {
+          url: 'https://slmall.oss-cn-beijing.aliyuncs.com/web/my/5.png',
+          text: '已取消',
+        },
       ],
       operaList: [
         { leftText: '优惠券', code: 'coupon' },

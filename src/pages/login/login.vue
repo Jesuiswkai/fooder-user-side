@@ -1,8 +1,11 @@
 <template>
   <app-page showNavbar immersiveNav>
-    <view class="container" :style="{ backgroundImage: `url(${bg})` }">
+    <view class="container">
       <view class="welcome">
-        <image src="@/static/login/login_text.png" mode="" />
+        <image
+          src="https://slmall.oss-cn-beijing.aliyuncs.com/web/login/login_text.png"
+          mode=""
+        />
       </view>
       <view class="center">
         <view class="form">
@@ -32,7 +35,6 @@
           <button class="login_btn">登录</button>
           <view class="other">
             <view>其他登录方式</view>
-            <!-- <image src="@/static/login/wechart.png" mode="" @click="wxlogin" /> -->
             <button
               open-type="getPhoneNumber"
               @getphonenumber="getPhoneNumber"
@@ -45,11 +47,9 @@
 </template>
 
 <script>
-import bg from '@/static/login/login_bg.png'
 export default {
   data() {
     return {
-      bg: bg,
       tips: '',
       // refCode: null,
       seconds: 10,
@@ -131,6 +131,7 @@ export default {
   width: 100%;
   height: 100%;
   font-family: 'PingFang SC';
+  background-image: url(https://slmall.oss-cn-beijing.aliyuncs.com/web/login/login_bg.png);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   .welcome {
@@ -228,7 +229,8 @@ export default {
           margin-top: 80rpx;
           width: 69rpx;
           height: 58rpx;
-          background: url('@/static/login/wechart.png') no-repeat;
+          background: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/login/wechart.png')
+            no-repeat;
           background-size: 100% 100%;
         }
       }

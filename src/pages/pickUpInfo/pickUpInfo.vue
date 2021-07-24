@@ -26,7 +26,10 @@
                   <view class="name">{{ item.userName }}</view>
                   <view class="phone-and-img">
                     <view class="phone">{{ item.phone }}</view>
-                    <image src="@/static/public/right.png" mode="" />
+                    <image
+                      src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+                      mode=""
+                    />
                   </view>
                 </view>
                 <view class="address">{{ item.detail }}</view>
@@ -54,7 +57,10 @@
       </scroll-view>
 
       <view v-show="!isShow" class="no-data">
-        <image src="@/static/public/placeholder.png" mode="" />
+        <image
+          src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/placeholder.png"
+          mode=""
+        />
         <text>暂无数据</text>
       </view>
     </view>

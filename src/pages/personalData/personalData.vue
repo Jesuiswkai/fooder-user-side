@@ -5,7 +5,10 @@
         <view class="form-item">
           <view class="title">头像</view>
           <view class="avatar">
-            <image src="@/static/public/payment_successful.png" mode="" />
+            <image
+              src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/payment_successful.png"
+              mode=""
+            />
             <button>更换</button>
           </view>
         </view>
@@ -14,7 +17,10 @@
           <view class="title">昵称</view>
           <view class="input">
             <input type="text" />
-            <image src="@/static/public/personal_clear.png" mode="" />
+            <image
+              src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/personal_clear.png"
+              mode=""
+            />
           </view>
         </view>
 
@@ -22,7 +28,10 @@
           <view class="title">手机号码</view>
           <view class="input">
             <input type="text" />
-            <image src="@/static/public/personal_clear.png" mode="" />
+            <image
+              src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/personal_clear.png"
+              mode=""
+            />
           </view>
         </view>
 
@@ -34,7 +43,10 @@
             }}</view>
             <view class="goto">
               <text>去绑定</text>
-              <image src="@/static/public/personal_goto.png" mode="" />
+              <image
+                src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/personal_goto.png"
+                mode=""
+              />
             </view>
           </view>
         </view>

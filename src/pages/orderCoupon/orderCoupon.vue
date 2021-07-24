@@ -3,7 +3,10 @@
     <view class="container">
       <view class="rule">
         <view>使用规则</view>
-        <image src="@/static/public/right.png" mode="" />
+        <image
+          src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+          mode=""
+        />
       </view>
       <view class="content">
         <view
@@ -120,7 +123,8 @@ export default {
     .coupon-list {
       width: 100%;
       height: 190rpx;
-      background: url('@/static/coupon/coupon_bg.png') no-repeat;
+      background: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/coupon/coupon_bg.png')
+        no-repeat;
       background-size: 100% 100%;
       position: relative;
       margin-bottom: 30rpx;

@@ -208,7 +208,6 @@
 </template>
 
 <script>
-import waiting from '@/static/order/waiting.png'
 export default {
   data() {
     return {
@@ -318,25 +317,25 @@ export default {
     }
   }
   .top.waiting {
-    background-image: url('@/static/order/waiting.png');
+    background-image: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/order/waiting.png');
     .title {
       color: #ff2424;
     }
   }
   .top.transit {
-    background-image: url('@/static/order/transit.png');
+    background-image: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/order/transit.png');
     .title {
       color: #24afff;
     }
   }
   .top.complete {
-    background-image: url('@/static/order/complete.png');
+    background-image: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/order/complete.png');
     .title {
       color: #2eb232;
     }
   }
   .top.cancel {
-    background-image: url('@/static/order/cancel.png');
+    background-image: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/order/cancel.png');
     .title {
       color: #666666;
     }

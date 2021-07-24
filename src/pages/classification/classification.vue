@@ -14,7 +14,11 @@
         :refresher-triggered="triggered"
       >
         <view class="search-input">
-          <image class="search-img" src="@/static/public/search.png" mode="" />
+          <image
+            class="search-img"
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/search.png"
+            mode=""
+          />
           <input
             v-model="searchValue"
             :focus="searchFocus"
@@ -25,7 +29,7 @@
             <image
               v-show="clearBtnShow"
               class="search-clear"
-              src="@/static/public/clear.png"
+              src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/clear.png"
               mode=""
               @click="clearSearch"
             />
@@ -105,14 +109,6 @@
 
 <script>
 import shopItem from '@/components/ShopItem/index.vue'
-import shop1 from '@/static/index/shop1.png'
-import shop2 from '@/static/index/shop2.png'
-
-import classify1 from '@/static/classifycation/classify1.png'
-import classify2 from '@/static/classifycation/classify2.png'
-import classify3 from '@/static/classifycation/classify3.png'
-import classify4 from '@/static/classifycation/classify4.png'
-import classify5 from '@/static/classifycation/classify5.png'
 
 import { mapGetters } from 'vuex'
 export default {
@@ -121,7 +117,6 @@ export default {
   },
   data() {
     return {
-      // isLogin: this.$store.getters['auth/isLogin'],
       pageLoading: true,
       isLogin: true,
       triggered: false,
@@ -129,11 +124,6 @@ export default {
       searchFocus: false, //是否获取焦点
       searchValue: '',
       historySearchList: ['猪饲料', '鸡饲料', '保健品', '饲养设备 猪食槽'],
-      // shopList: [
-      //   { src: shop1, name: '双胞胎种猪配合饲料40kg', price: '¥100' },
-      //   { src: shop2, name: '双胞胎种猪配合饲料60kg', price: '¥150' },
-      //   { src: shop2, name: '双胞胎种猪配合饲料80kg', price: '¥200' },
-      // ],
       shopList: {
         loading: false,
         finished: false,
@@ -141,24 +131,45 @@ export default {
         pageSize: 10,
         typeOneId: '',
         typeTwoId: '',
-        data: [
-          // { img: shop1, name: '双胞胎种猪配合饲料40kg', money: '¥100' },
-          // { img: shop2, name: '双胞胎种猪配合饲料60kg', money: '¥150' },
-          // { img: shop2, name: '双胞胎种猪配合饲料80kg', money: '¥200' },
-        ],
+        data: [],
       },
       firstList: [
         {
-          image: classify1,
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/classifycation/classify1.png',
           name: '猪料',
           width: '52rpx',
           height: '40rpx',
           action: 1,
         },
-        { image: classify2, name: '鱼料', width: '52rpx', height: '29rpx' },
-        { image: classify3, name: '动保', width: '40rpx', height: '40rpx' },
-        { image: classify4, name: '消耗品', width: '20rpx', height: '40rpx' },
-        { image: classify5, name: '设备', width: '40rpx', height: '40rpx' },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/classifycation/classify2.png',
+          name: '鱼料',
+          width: '52rpx',
+          height: '29rpx',
+        },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/classifycation/classify3.png',
+          name: '动保',
+          width: '40rpx',
+          height: '40rpx',
+        },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/classifycation/classify4.png',
+          name: '消耗品',
+          width: '20rpx',
+          height: '40rpx',
+        },
+        {
+          image:
+            'https://slmall.oss-cn-beijing.aliyuncs.com/web/classifycation/classify5.png',
+          name: '设备',
+          width: '40rpx',
+          height: '40rpx',
+        },
       ],
       secondList: [{ id: '', name: '全部', action: 1 }],
       // scrollViewHeight: '972rpx',

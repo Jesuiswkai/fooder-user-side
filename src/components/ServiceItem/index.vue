@@ -16,7 +16,10 @@
       <view class="address">{{ obj.addressDetail }}</view>
     </view>
     <view v-show="obj.action == 1" class="action">
-      <image src="@/static/public/sel_pro.png" mode="" />
+      <image
+        src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/sel_pro.png"
+        mode=""
+      />
     </view>
   </view>
 </template>

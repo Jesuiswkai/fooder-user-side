@@ -17,7 +17,10 @@
             @confirm="confirm"
           ></u-select>
           <view class="area-text">{{ currentLocation }}</view>
-          <image src="@/static/public/right.png" mode="" />
+          <image
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/right.png"
+            mode=""
+          />
         </view>
       </view>
 
@@ -41,7 +44,6 @@
 
 <script>
 import serviceItem from '@/components/ServiceItem/index.vue'
-import shop1 from '@/static/index/shop1.png'
 export default {
   components: {
     serviceItem,

@@ -3,7 +3,10 @@
     <view class="container">
       <view class="content">
         <view class="center">
-          <image src="@/static/public/payment_successful.png" mode="" />
+          <image
+            src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/payment_successful.png"
+            mode=""
+          />
           <view>支付成功</view>
         </view>
       </view>

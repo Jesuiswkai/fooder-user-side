@@ -48,7 +48,10 @@
         </lazy-list>
       </scroll-view>
       <view v-show="!isShow" class="no-data">
-        <image src="@/static/coupon/coupon_nodata.png" mode="" />
+        <image
+          src="https://slmall.oss-cn-beijing.aliyuncs.com/web/coupon/coupon_nodata.png"
+          mode=""
+        />
         <text>暂无可领取优惠券</text>
       </view>
     </view>
@@ -145,7 +148,8 @@ export default {
     .coupon-list {
       width: 100%;
       height: 190rpx;
-      background: url('@/static/coupon/coupon_bg.png') no-repeat;
+      background: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/coupon/coupon_bg.png')
+        no-repeat;
       background-size: 100% 100%;
       position: relative;
       margin-bottom: 30rpx;

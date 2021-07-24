@@ -2,7 +2,10 @@
   <view class="container">
     <view class="modal">
       <view class="head">
-        <image src="@/static/public/update_head.png" mode="" />
+        <image
+          src="https://slmall.oss-cn-beijing.aliyuncs.com/web/public/update_head.png"
+          mode=""
+        />
       </view>
       <view class="body">
         <view class="title">更新内容</view>
