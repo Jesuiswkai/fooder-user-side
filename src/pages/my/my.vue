@@ -109,6 +109,9 @@ export default {
           })
           break
         case 'pickUp':
+          uni.navigateTo({
+            url: '../pickUpInfo/pickUpInfo',
+          })
           break
         case 'service':
           break

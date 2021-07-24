@@ -5,7 +5,7 @@
       <view class="service">
         <view class="service-title">
           <view class="text">选择服务商</view>
-          <button class="btn">更换</button>
+          <button class="btn" @click="providerChange">更换</button>
         </view>
 
         <view class="service-content">
@@ -38,16 +38,19 @@
             <!--门店自提-->
             <view v-show="tabShow" class="fixed-content">
               <view class="item">
-                <view>陈锐</view>
+                <view>{{ deliveryMethod.userName }}</view>
                 <view class="info">
-                  <text>18002334272</text>
-                  <image src="@/static/public/right.png" mode="" />
+                  <text>{{ deliveryMethod.phone }}</text>
+                  <view @click="selectPickUp">
+                    <text v-show="deliveryMethod.status == 0">请选择</text>
+                    <image src="@/static/public/right.png" mode="" />
+                  </view>
                 </view>
               </view>
               <view class="item">
                 <view>预计自提时间</view>
-                <view class="info">
-                  <text>2021.06.29</text>
+                <view class="info" @click="openPicker">
+                  <text>{{ deliveryMethod.expectTime }}</text>
                   <image
                     src="@/static/public/date_time.png"
                     mode=""
@@ -60,18 +63,21 @@
             <view v-show="!tabShow" class="mobile-content">
               <view class="dis-item">
                 <view class="info">
-                  <view>陈锐</view>
+                  <view>{{ deliveryMethod.userName }}</view>
                   <view class="phone">
-                    <text>18002334272</text>
-                    <image src="@/static/public/right.png" mode="" />
+                    <text>{{ deliveryMethod.phone }}</text>
+                    <view @click="selectPickUp">
+                      <text v-show="deliveryMethod.status == 0">请选择</text>
+                      <image src="@/static/public/right.png" mode="" />
+                    </view>
                   </view>
                 </view>
-                <view class="address">重庆市江北区西普大厦10-1</view>
+                <view class="address">{{ deliveryMethod.detail }}</view>
               </view>
               <view class="item">
                 <view>期望配送时间</view>
-                <view class="info">
-                  <text>2021.06.29</text>
+                <view class="info" @click="openPicker">
+                  <text>{{ deliveryMethod.expectTime }}</text>
                   <image src="@/static/public/date_time.png" mode="" />
                 </view>
               </view>
@@ -142,37 +148,58 @@
       v-model="modalData.show"
       :show-confirm-button="false"
     >
-      <scroll-view class="modal-content" scroll-y>
-        <view class="underline" v-if="modalData.type == 1">
-          <view
-            class="list"
-            :class="item.action == 1 ? 'action' : ''"
-            v-for="(item, index) of modalData.underlineList"
-            :key="index"
-            @click="selectPick(item)"
-          >
-            <view class="name">{{ item.name }}</view>
-            <view class="info">
-              <view class="phone">{{ item.phone }}</view>
-              <view class="img" @click.stop="toPickUp">
-                <image src="@/static/public/right.png" mode="" />
+      <scroll-view
+        class="modal-content"
+        scroll-y
+        @scrolltolower="scrollToLower()"
+        :refresher-enabled="modalData.isLogin"
+        @refresherrefresh="refreshData()"
+        :refresher-triggered="modalData.triggered"
+      >
+        <lazy-list
+          v-model="modalData.loading"
+          :list="modalData.data"
+          :finished="modalData.finished"
+          @load="loadData"
+          proxy
+          ref="lazyList"
+          hideLoadmore
+        >
+          <view class="underline">
+            <view
+              class="list"
+              :class="item.action == 1 ? 'action' : ''"
+              v-for="(item, index) of modalData.data"
+              :key="index"
+              @click="selectPick(item)"
+            >
+              <view class="one">
+                <view class="name">{{ item.userName }}</view>
+                <view class="info">
+                  <view class="phone">{{ item.phone }}</view>
+                  <view class="img" @click.stop="toPickUp">
+                    <image src="@/static/public/right.png" mode="" />
+                  </view>
+                </view>
               </view>
+              <view v-if="!tabShow" class="two">{{ item.detail }}</view>
             </view>
+
+            <view class="add">新增信息</view>
           </view>
-
-          <view class="add">新增信息</view>
-        </view>
-
-        <view class="online" v-else>
-          <view class="list"></view>
-          <view class="add">新增信息</view>
-        </view>
+        </lazy-list>
       </scroll-view>
       <view class="modal-btn">
-        <button class="cancel" @click="cancel">取消</button>
-        <button class="confirm">确定</button>
+        <button class="cancel" @click="cancelAddress">取消</button>
+        <button class="confirm" @click="confirmAddress">确定</button>
       </view>
     </u-modal>
+    <u-picker
+      v-model="pickerObj.show"
+      mode="time"
+      start-year="2020"
+      @confirm="confirmTime"
+    ></u-picker>
   </app-page>
 </template>
 
@@ -193,11 +220,10 @@ export default {
       providerObj: {
         id: '',
         image: '',
-        name: '西普6号',
+        name: '',
         isDefault: 1,
-        distanceString: '2.80km',
-        addressDetail:
-          '重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号重庆市渝中区纯阳洞5号',
+        distanceString: '',
+        addressDetail: '',
       },
       shopObjs: [],
       shopList: [
@@ -208,22 +234,29 @@ export default {
       couponList: [], //优惠券列表
       modalData: {
         show: false,
-        type: 2,
-        underlineList: [
-          { name: '陈锐', phone: '17623563437', action: 1 },
-          { name: '陈锐', phone: '17623563437' },
-          { name: '陈锐', phone: '17623563437' },
-          { name: '陈锐', phone: '17623563437' },
-          { name: '陈锐', phone: '17623563437' },
-          { name: '陈锐', phone: '17623563437' },
-        ],
+        isLogin: true,
+        triggered: false,
+        loading: false,
+        finished: false,
+        page: 1,
+        pageSize: 10,
+        data: [],
       },
       tabShow: true,
       deliveryMethod: {
-        //自提
-        submit: {},
-        //线上
-        onLine: {},
+        userName: '',
+        phone: '',
+        province: '',
+        city: '',
+        area: '',
+        detail: '',
+        isDefault: '',
+        status: 1, //是否有默认地址
+        expectTime: '',
+      },
+      pickerObj: {
+        show: false,
+        time: '',
       },
     }
   },
@@ -246,36 +279,120 @@ export default {
     if (data.previewData) {
       this.updateOrderInfo(JSON.parse(data.previewData))
     }
+    //获取默认地址
+    this.getDefaultAddress()
   },
   onShow() {
-    const providerInfo = this.$store.getters['other/getProvider']
-    this.updateProvider(providerInfo)
+    let defaultProvider = this.$store.getters['other/defaultProvider']
+    let selectProvider = this.$store.getters['other/selectProvider']
+    if (Object.keys(selectProvider).length > 0) {
+      this.updateProvider(selectProvider)
+    } else {
+      this.updateProvider(defaultProvider)
+    }
   },
   onUnload() {
     this.$store.commit('other/emptyCoupon')
+    this.$store.commit('other/emptySelectProvider')
   },
   methods: {
-    cancel() {
-      this.modalData.show = false
-    },
     toPickUp() {
       console.log(1)
     },
+    scrollToLower() {
+      this.modalData.page += 1
+      console.log(this.modalData.page)
+      this.$refs['lazyList'].loadMore()
+    },
+    refreshData() {
+      if (!this.modalData.triggered) {
+        this.modalData.triggered = true
+      }
+      this.modalData.page = 1
+      this.modalData.data = []
+      this.modalData.finished = false
+      this.loadData()
+    },
+    selectPickUp() {
+      this.modalData.show = true
+      this.loadData()
+    },
+    loadData() {
+      this.modalData.loading = true
+      const data = {
+        page: this.modalData.page,
+        pageSize: this.modalData.pageSize,
+      }
+      if (this.modalData.finished) {
+        return
+      }
+      this.Api.user.getUserAddressList.do(data).then((res) => {
+        this.modalData.loading = false
+        this.modalData.triggered = false
+        if (res.list.length != 0) {
+          for (let i = 0; i < res.list.length; i++) {
+            if (i == 0) {
+              res.list[i].action = 1
+            } else {
+              res.list[i].action = 0
+            }
+            this.modalData.data.push(res.list[i])
+          }
+        } else {
+          this.modalData.finished = true
+        }
+      })
+    },
+    cancelAddress() {
+      this.modalData.show = false
+    },
+    confirmAddress() {
+      const data = this.modalData.data.filter((item) => {
+        return item.action == 1
+      })
+      for (let key in this.deliveryMethod) {
+        this.deliveryMethod[key] = data[0][key]
+      }
+      this.modalData.show = false
+    },
+    openPicker() {
+      this.pickerObj.show = true
+    },
+    confirmTime(data) {
+      this.deliveryMethod.expectTime =
+        data.year + '-' + data.month + '-' + data.day
+    },
+    providerChange() {
+      uni.navigateTo({
+        url: '../serviceProvider/serviceProvider?type=change',
+      })
+    },
     selectPick(data) {
-      for (let item of this.modalData.underlineList) {
+      for (let item of this.modalData.data) {
         if (item.action == 1) {
           item.action = 0
         }
       }
       this.$set(data, 'action', 1)
     },
-    //更新服务商
+    // 获取默认地址
+    getDefaultAddress() {
+      this.Api.user.getDefaultAddress.do().then((res) => {
+        if (res) {
+          for (let key in this.deliveryMethod) {
+            this.deliveryMethod[key] = res[key]
+          }
+        } else {
+          this.deliveryMethod.status = 0
+        }
+      })
+    },
+    // 更新服务商
     updateProvider(data) {
       // 服务商
       for (let obj in this.providerObj) {
         this.providerObj[obj] = data[obj]
       }
-      this.providerObj.isDefault = 1
     },
     //切换配送方式
     switchDispath(status) {
@@ -323,6 +440,8 @@ export default {
             minus: 1,
           })
         }
+      } else {
+        this.shopList.splice(1, 1)
       }
       //商品原价&现价
       this.shopList[0].price = data.goodsOriginAmount
@@ -351,18 +470,18 @@ export default {
         pickWay: this.tabShow ? '1' : '2', //提货方式 1: 自提 2: 配送
         goods: goods,
         conponId: this.selectedCoupon ? this.selectedCoupon.id : '', //优惠券ID
-        selfName: '万锴', //自提人名称
-        selfPhone: '17623563437', //自提人电话
+        selfName: this.deliveryMethod.userName, //自提人名称
+        selfPhone: this.deliveryMethod.phone, //自提人电话
         expectTime: '2021-07-06 18:26:00', //期望配送时间
         remark: '备注', //备注
         payType: 2, //2: 小程序  1: app
         openId: this.$store.getters['auth/openId'],
-        consignee: 'oliver', //收货人
-        contactNumber: '123456', //联系电话
-        province: '重庆', //省
-        city: '重庆市', //市
-        area: '南岸区', //区
-        detailAddress: '122323', //详细地址
+        consignee: this.deliveryMethod.userName, //收货人
+        contactNumber: this.deliveryMethod.phone, //联系电话
+        province: this.deliveryMethod.province, //省
+        city: this.deliveryMethod.city, //市
+        area: this.deliveryMethod.area, //区
+        detailAddress: this.deliveryMethod.detail, //详细地址
       }
       this.Api.order.orderPay.do(data).then((res) => {
         uni.requestPayment({
@@ -668,7 +787,7 @@ export default {
 .modal {
   .modal-content {
     padding: 30rpx;
-    max-height: 500rpx;
+    height: 50vh;
     .underline {
       padding-bottom: 60rpx;
       .list:not(:last-child) {
@@ -676,52 +795,38 @@ export default {
       }
       .list {
         width: 630rpx;
-        height: 110rpx;
         border-radius: 20rpx;
         background: #f5f5f5;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
         padding: 34rpx 30rpx;
-        .name {
-          font-size: 30rpx;
-          font-weight: bold;
-          color: #333333;
-        }
-        .info {
+        .one {
           display: flex;
+          justify-content: space-between;
           align-items: center;
-          .phone {
+          .name {
             font-size: 30rpx;
             font-weight: bold;
             color: #333333;
           }
-          .img {
-            padding-left: 56rpx;
-            image {
-              width: 12rpx;
-              height: 20rpx;
+          .info {
+            display: flex;
+            align-items: center;
+            .phone {
+              font-size: 30rpx;
+              font-weight: bold;
+              color: #333333;
+            }
+            .img {
+              padding-left: 56rpx;
+              image {
+                width: 12rpx;
+                height: 20rpx;
+              }
             }
           }
         }
-      }
-      .list.action {
-        background: #f4fff1;
-        border: 1px solid #2eb232;
-        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-      }
-    }
-    .online {
-      padding-bottom: 60rpx;
-      .list:not(:last-child) {
-        margin-bottom: 30rpx;
-      }
-      .list {
-        width: 630rpx;
-        height: 164rpx;
-        border-radius: 20rpx;
-        background: #f5f5f5;
-        padding: 34rpx 30rpx;
+        .two {
+          margin-top: 20rpx;
+        }
       }
       .list.action {
         background: #f4fff1;

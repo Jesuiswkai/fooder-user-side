@@ -302,6 +302,7 @@ export default {
       }
       this.shopList.page = 1
       this.shopList.data = []
+      this.shopList.finished = false
       this.loadData()
     },
     loadData() {
@@ -342,7 +343,7 @@ export default {
         }
 
         const data = {
-          providersId: this.$store.getters['other/getProvider'].id,
+          providersId: this.$store.getters['other/defaultProvider'].id,
           pickWay: 1,
           goods: goods,
         }

@@ -259,6 +259,7 @@ export default {
       }
       this.shopList.page = 1
       this.shopList.data = []
+      this.shopList.finished = false
       this.loadData()
     },
     loadData() {

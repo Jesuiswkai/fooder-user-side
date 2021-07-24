@@ -87,7 +87,7 @@ export default {
     },
     orderNow() {
       const data = {
-        providersId: this.$store.getters['other/getProvider'].id,
+        providersId: this.$store.getters['other/defaultProvider'].id,
         pickWay: 1,
         goods: [{ goodsId: this.productInfo.id, num: 1 }],
       }

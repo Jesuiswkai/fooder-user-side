@@ -205,9 +205,12 @@ export default {
       this.$refs['lazyList'].loadMore()
     },
     refreshData() {
-      this.triggered = true
+      if (!this.triggered) {
+        this.triggered = true
+      }
       this.shopList.page = 1
       this.shopList.data = []
+      this.search()
     },
     resetSearch() {
       this.shopList.finished = false
@@ -222,7 +225,6 @@ export default {
         page: this.shopList.page,
         pageSize: this.shopList.pageSize,
       }
-      console.log(this.shopList.finished)
       if (this.shopList.finished || data.name == '') {
         this.shopList.loading = false
         return
@@ -230,6 +232,7 @@ export default {
       this.Api.product.getGoodsListByName.do(data).then((res) => {
         this.pageLoading = false
         this.shopList.loading = false
+        this.triggered = false
         this.$store.commit('other/setsh', data.name)
         console.log(this.$store.getters['other/getsh'])
         if (res.list.length != 0) {

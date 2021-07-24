@@ -2,15 +2,19 @@ export default {
   namespaced: true,
   state: {
     searchHistory: [],
-    provider: {},
+    defaultProvider: {}, //默认、最近的服务商
+    selectProvider: {}, //订单页选择的服务商
     coupon: null
   },
   getters: {
     getsh: (state, getters, rootState, rootGetters) => {
       return state.searchHistory
     },
-    getProvider: state => {
-      return state.provider
+    defaultProvider: state => {
+      return state.defaultProvider
+    },
+    selectProvider: state => {
+      return state.selectProvider
     },
     getCoupon: state => {
       return state.getCoupon
@@ -31,8 +35,15 @@ export default {
       state.searchHistory = []
     },
     // 设置服务商
-    setProvider: (state, step) => {
-      state.provider = step
+    defaultProvider: (state, step) => {
+      state.defaultProvider = step
+    },
+    // 设置订单页选择的服务商
+    selectProvider: (state, step) => {
+      state.selectProvider = step
+    },
+    emptySelectProvider: (state, step) => {
+      state.selectProvider = {}
     },
     // 设置选择的优惠券
     setCoupon: (state, step) => {

@@ -153,7 +153,7 @@ export default {
         })
         .then((res) => {
           this.latelyProviders = res
-          this.$store.commit('other/setProvider', res)
+          this.$store.commit('other/defaultProvider', res)
         })
     },
     //获取地理位置

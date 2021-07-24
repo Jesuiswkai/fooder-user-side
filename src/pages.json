@@ -7,6 +7,12 @@
       }
     },
     {
+      "path": "pages/order/order",
+      "style": {
+        "navigationBarTitleText": "确认下单"
+      }
+    },
+    {
       "path": "pages/pickUpInfo/pickUpInfo",
       "style": {
         "navigationBarTitleText": "提货信息"
@@ -40,12 +46,6 @@
       "path": "pages/orderCoupon/orderCoupon",
       "style": {
         "navigationBarTitleText": "选择优惠券"
-      }
-    },
-    {
-      "path": "pages/order/order",
-      "style": {
-        "navigationBarTitleText": "确认下单"
       }
     },
     {

@@ -107,6 +107,9 @@ export default {
             }
           }
         })
+      } else {
+        data.isDefault = 0
+        this.Api.user.updateUserAddress.do(data).then((res) => {})
       }
     },
     // 添加地址

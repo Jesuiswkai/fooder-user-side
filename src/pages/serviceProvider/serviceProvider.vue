@@ -90,13 +90,17 @@ export default {
           { label: '澳门特别行政区' },
         ],
       },
+      type: null,
     }
   },
-  onLoad() {
+  onLoad(data) {
     const city = this.$store.getters['auth/getCity']
     if (city) {
       this.currentLocation = city
       this.getProviders(city)
+    }
+    if (data.type == 'change') {
+      this.type = 'change'
     }
   },
   methods: {
@@ -138,17 +142,24 @@ export default {
         return item.action == 1
       })
       if (arr.length > 0) {
-        const data = {
-          providersId: arr[0].id,
-        }
-        this.Api.provide.setDefaultProviders.do(data).then((res) => {
-          this.getProviders(this.$store.getters['auth/getCity'])
-          uni.showToast({
-            title: '设置默认服务商成功',
-            icon: 'none',
-            duration: 2000,
+        if (this.type == 'change') {
+          // 订单页重设服务商
+          this.$store.commit('other/selectProvider', arr[0])
+          uni.navigateBack()
+        } else {
+          // 设置默认服务商
+          const data = {
+            providersId: arr[0].id,
+          }
+          this.Api.provide.setDefaultProviders.do(data).then((res) => {
+            this.getProviders(this.$store.getters['auth/getCity'])
+            uni.showToast({
+              title: '设置默认服务商成功',
+              icon: 'none',
+              duration: 2000,
+            })
           })
-        })
+        }
       } else {
         uni.showToast({
           title: '请选择服务商',
