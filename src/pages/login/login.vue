@@ -35,7 +35,9 @@
           <button class="login_btn">登录</button>
           <view class="other">
             <view>其他登录方式</view>
+            <button v-if="platform != 2" @click="wxlogin"></button>
             <button
+              v-else
               open-type="getPhoneNumber"
               @getphonenumber="getPhoneNumber"
             ></button>
@@ -54,12 +56,14 @@ export default {
       // refCode: null,
       seconds: 10,
       checked: false,
-      code: null,
       encryptedData: null,
+      loginInfo: {},
+      platform: null, //平台信息
     }
   },
   onLoad() {
     this.getWxLoginParams()
+    this.platform = this.$store.getters['auth/platform']
   },
   methods: {
     codeChange(text) {
@@ -85,6 +89,7 @@ export default {
     getPhoneNumber(res) {
       this.encryptedData = res.detail.encryptedData
       this.iv = res.detail.iv
+      console.log('按钮')
       this.wxlogin()
     },
     // 获取微信登录信息
@@ -92,30 +97,54 @@ export default {
       uni.login({
         provider: 'weixin',
         success: (res) => {
-          this.code = res.code
+          if (this.platform != 2) {
+            this.loginInfo = res.authResult
+          } else {
+            this.loginInfo.code = res.code
+          }
         },
       })
     },
     wxlogin() {
-      this.Api.user.login
-        .do({
-          code: this.code,
-          encryptedData: this.encryptedData,
-          iv: this.iv,
-        })
-        .then((res) => {
-          this.$store.commit('auth/login', res)
-          uni.switchTab({
-            url: '../index/index',
+      if (this.platform != 2) {
+        this.Api.user.appWxLogin
+          .do({
+            unionId: this.loginInfo.unionid,
+            accessToken: this.loginInfo.access_token,
+            openId: this.loginInfo.openid,
           })
-          this.getUserInfo()
-        })
+          .then((res) => {
+            this.$store.commit('auth/login', res)
+            uni.switchTab({
+              url: '../index/index',
+            })
+            this.getUserInfo(this.loginInfo.openid)
+          })
+      } else {
+        this.Api.user.wxLogin
+          .do({
+            code: this.loginInfo.code,
+            encryptedData: this.encryptedData,
+            iv: this.iv,
+          })
+          .then((res) => {
+            this.$store.commit('auth/login', res)
+            uni.switchTab({
+              url: '../index/index',
+            })
+            this.getUserInfo()
+          })
+      }
     },
     // 获取用户信息
-    getUserInfo() {
-      this.Api.user.getInfo.do().then((res) => {
-        this.$store.commit('auth/openId', res.user.openId)
-      })
+    getUserInfo(openId) {
+      if (openId) {
+        this.$store.commit('auth/openId', openId)
+      } else {
+        this.Api.user.getInfo.do().then((res) => {
+          this.$store.commit('auth/openId', res.user.openId)
+        })
+      }
     },
   },
 }
@@ -131,7 +160,7 @@ export default {
   width: 100%;
   height: 100%;
   font-family: 'PingFang SC';
-  background-image: url(https://slmall.oss-cn-beijing.aliyuncs.com/web/login/login_bg.png);
+  background-image: url('https://slmall.oss-cn-beijing.aliyuncs.com/web/login/login_bg.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
   .welcome {

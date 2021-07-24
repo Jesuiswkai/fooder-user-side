@@ -1,17 +1,25 @@
 import Api from '../source/Api'
 
 export default {
-  login: new Api({
+  // 小程序微信登录
+  wxLogin: new Api({
     url: '/user/WxLogin',
     method: 'post',
     public: true
   }),
 
-  getPayInfo: new Api({
-    url: '/order/orderPay',
+  // APP微信登录
+  appWxLogin: new Api({
+    url: '/user/appWxLogin',
     method: 'post',
     public: true
   }),
+
+  // getPayInfo: new Api({
+  //   url: '/order/orderPay',
+  //   method: 'post',
+  //   public: true
+  // }),
 
   // 获取用户优惠券列表
   getUserCouponList: new Api({

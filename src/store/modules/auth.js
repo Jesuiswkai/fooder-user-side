@@ -4,6 +4,7 @@ export default {
     isLogin: false,
     userId: null,
     token: null,
+    phone: null, //是否绑定手机号 0否 1是
     location: {}, //位置信息，经纬度
     city: null, //当前城市信息
     platform: 2, //平台信息 0: android 1: ios 2: 小程序
@@ -31,11 +32,15 @@ export default {
   },
   mutations: {
     login: (state, step) => {
+      if (step.phone) {
+        state.phone = step.phone
+      }
       state.userId = step.userId
       state.token = step.token
       state.isLogin = true
     },
     logout: (state, step) => {
+      state.phone = null
       state.userId = null
       state.token = null
       state.isLogin = false
